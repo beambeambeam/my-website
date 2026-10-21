@@ -3,6 +3,7 @@ import { useRef } from "react";
 
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
+import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
 import { useInView } from "@/hooks/use-in-view";
 
@@ -38,11 +39,14 @@ const HomeComponent = () => {
       {/* Temporary scroll space to preview the profile card. */}
       <div aria-hidden className="h-[300vh]" />
       {!headerInView && (
-        <div className="pointer-events-none fixed inset-x-0 top-4 z-10 hidden lg:block">
-          <div className="mx-auto w-full max-w-10xl px-4 sm:px-6">
-            <ProfileCard {...profile} className="pointer-events-auto" />
+        <>
+          <ProfileBar {...profile} className="fixed inset-x-0 top-0 z-10 lg:hidden" />
+          <div className="pointer-events-none fixed inset-x-0 top-4 z-10 hidden lg:block">
+            <div className="mx-auto w-full max-w-10xl px-4 sm:px-6">
+              <ProfileCard {...profile} className="pointer-events-auto" />
+            </div>
           </div>
-        </div>
+        </>
       )}
     </main>
   );
