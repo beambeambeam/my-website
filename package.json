@@ -27,6 +27,7 @@
     "test:watch": "vp test watch",
     "lint": "vp lint",
     "format": "vp fmt",
+    "format:check": "vp fmt --check",
     "staged": "vp staged",
     "hooks:setup": "vp config",
     "dev:portfolio": "vp run --filter portfolio dev",
