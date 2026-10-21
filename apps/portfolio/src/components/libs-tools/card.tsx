@@ -17,8 +17,24 @@ interface ToolLogoProps {
   color: string;
 }
 
-const ToolLogo = ({ tool, color }: ToolLogoProps) =>
-  tool.icon ? (
+const ToolLogo = ({ tool, color }: ToolLogoProps) => {
+  if (tool.svgSrc !== undefined) {
+    return (
+      <span
+        aria-hidden="true"
+        className="block size-full"
+        style={{
+          backgroundColor: color,
+          maskImage: `url(${tool.svgSrc})`,
+          maskPosition: "center",
+          maskRepeat: "no-repeat",
+          maskSize: "contain",
+        }}
+      />
+    );
+  }
+
+  return tool.icon ? (
     <svg aria-hidden="true" viewBox="0 0 24 24" className="size-full" style={{ color }}>
       <path d={tool.icon.path} fill="currentColor" />
     </svg>
@@ -31,6 +47,7 @@ const ToolLogo = ({ tool, color }: ToolLogoProps) =>
       {tool.name}
     </span>
   );
+};
 
 interface LibsToolsCardProps {
   className?: string;
@@ -109,6 +126,7 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
                       className="size-full"
                       first={<ToolLogo tool={tool} color="var(--muted-foreground)" />}
                       second={<ToolLogo tool={tool} color={tool.color} />}
+                      gridSize={10}
                     />
                   </motion.li>
                 ))}
