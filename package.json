@@ -13,7 +13,8 @@
       "varlock": "1.18.0",
       "next-themes": "^0.4.6",
       "sonner": "^2.0.8",
-      "tailwindcss": "^4.3.3"
+      "tailwindcss": "^4.3.3",
+      "vitest": "4.1.11"
     }
   },
   "type": "module",
@@ -22,6 +23,8 @@
     "build": "vp run -r build",
     "check-types": "vp run -r check-types",
     "check": "vp check && vp run -r check-types",
+    "test": "vp test run",
+    "test:watch": "vp test watch",
     "lint": "vp lint",
     "format": "vp fmt",
     "staged": "vp staged",
@@ -41,7 +44,8 @@
     "ultracite": "7.12.0",
     "varlock": "catalog:",
     "vite": "catalog:",
-    "vite-plus": "1.1.0"
+    "vite-plus": "1.1.0",
+    "vitest": "catalog:"
   },
   "overrides": {
     "vite": "npm:@voidzero-dev/vite-plus-core@1.1.0"
