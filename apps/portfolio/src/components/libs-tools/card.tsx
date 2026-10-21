@@ -5,49 +5,12 @@ import { useState } from "react";
 
 import { toolCategories } from "@/components/libs-tools/data";
 import type { Tool } from "@/components/libs-tools/data";
-import { PixelTransition } from "@/components/pixel-transition";
+import { PixelLogo } from "@/components/libs-tools/pixel-logo";
 
 interface HoveredTool {
   category: string;
   tool: Tool;
 }
-
-interface ToolLogoProps {
-  tool: Tool;
-  color: string;
-}
-
-const ToolLogo = ({ tool, color }: ToolLogoProps) => {
-  if (tool.svgSrc !== undefined) {
-    return (
-      <span
-        aria-hidden="true"
-        className="block size-full"
-        style={{
-          backgroundColor: color,
-          maskImage: `url(${tool.svgSrc})`,
-          maskPosition: "center",
-          maskRepeat: "no-repeat",
-          maskSize: "contain",
-        }}
-      />
-    );
-  }
-
-  return tool.icon ? (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-full" style={{ color }}>
-      <path d={tool.icon.path} fill="currentColor" />
-    </svg>
-  ) : (
-    <span
-      aria-hidden="true"
-      className="flex size-full items-center justify-center rounded-md border border-current font-mono text-xs font-bold"
-      style={{ color }}
-    >
-      {tool.name}
-    </span>
-  );
-};
 
 interface LibsToolsCardProps {
   className?: string;
@@ -121,13 +84,7 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
                     }}
                   >
                     <span className="sr-only">{tool.name}</span>
-                    <PixelTransition
-                      active={hovered?.tool.name === tool.name}
-                      className="size-full"
-                      first={<ToolLogo tool={tool} color="var(--muted-foreground)" />}
-                      second={<ToolLogo tool={tool} color={tool.color} />}
-                      gridSize={10}
-                    />
+                    <PixelLogo tool={tool} active={hovered?.tool.name === tool.name} />
                   </motion.li>
                 ))}
               </ul>
