@@ -5,5 +5,10 @@ export const Route = createFileRoute("/")({
 });
 
 function HomeComponent() {
-  return null;
+  return (
+    <div className="p-8">
+      <p>Hey I'm Beam!</p>
+      <p>Software & Design Engineer</p>
+    </div>
+  );
 }
