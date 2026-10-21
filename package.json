@@ -26,9 +26,9 @@
     "format": "vp fmt",
     "staged": "vp staged",
     "hooks:setup": "vp config",
-    "dev:web": "vp run --filter web dev",
-    "env:generate": "varlock codegen --path ./apps/web/",
-    "postinstall": "varlock codegen --path ./apps/web/"
+    "dev:portfolio": "vp run --filter portfolio dev",
+    "env:generate": "varlock codegen --path ./apps/portfolio/",
+    "postinstall": "varlock codegen --path ./apps/portfolio/"
   },
   "dependencies": {
     "zod": "catalog:"

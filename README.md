@@ -32,7 +32,7 @@ React web apps in this stack share shadcn/ui primitives through `packages/ui`.
 
 - Change design tokens and global styles in `packages/ui/src/styles/globals.css`
 - Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
+- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/portfolio/components.json`
 
 ### Add more shared components
 
@@ -50,7 +50,7 @@ import { Button } from "@my-website/ui/components/button";
 
 ### Add app-specific blocks
 
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
+If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/portfolio`.
 
 ## Environment Configuration
 
@@ -73,7 +73,7 @@ Run standalone Node/Bun tools that use Varlock from the owning app directory so 
 ```
 my-website/
 ├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
+│   ├── portfolio/   # Frontend application (React + TanStack Router)
 ├── packages/
 │   ├── ui/          # Shared shadcn/ui components and styles
 ```
@@ -82,7 +82,7 @@ my-website/
 
 - `bun run dev`: Start all applications in development mode
 - `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
+- `bun run dev:portfolio`: Start only the portfolio application
 - `bun run check-types`: Check TypeScript types across all apps
 - `bun run check`: Run Vite+ format/lint checks and workspace TypeScript checks
 - `bun run lint`: Run Vite+ lint checks

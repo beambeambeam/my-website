@@ -5,9 +5,9 @@ export default defineConfig({
     ignorePatterns: [
       "node_modules/**",
       "**/node_modules/**",
-      "apps/web/dist/**",
-      "apps/web/.tanstack/**",
-      "apps/web/src/routeTree.gen.ts",
+      "apps/portfolio/dist/**",
+      "apps/portfolio/.tanstack/**",
+      "apps/portfolio/src/routeTree.gen.ts",
     ],
     options: {
       typeAware: false,
@@ -18,9 +18,9 @@ export default defineConfig({
     ignorePatterns: [
       "node_modules/**",
       "**/node_modules/**",
-      "apps/web/dist/**",
-      "apps/web/.tanstack/**",
-      "apps/web/src/routeTree.gen.ts",
+      "apps/portfolio/dist/**",
+      "apps/portfolio/.tanstack/**",
+      "apps/portfolio/src/routeTree.gen.ts",
     ],
     singleQuote: false,
     semi: true,
