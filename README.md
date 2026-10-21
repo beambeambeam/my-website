@@ -1,91 +1,85 @@
 # my-website
 
-This project was created with [Better-T-Stack](https://github.com/AmanVarshney01/create-better-t-stack), a modern TypeScript stack that combines React, TanStack Router, and more.
+Personal portfolio site for Beam, live at [thisisbeam.fyi](https://thisisbeam.fyi).
 
-## Features
+## Stack
 
-- **TypeScript** - For type safety and improved developer experience
-- **TanStack Router** - File-based routing with full type safety
-- **TailwindCSS** - Utility-first CSS for rapid UI development
-- **Shared UI package** - shadcn/ui primitives live in `packages/ui`
-- **Vite+** - Unified Vite toolchain, workspace task runner, linting, and formatting
+- **React 19** and **TanStack Router** (client-only SPA, file-based routes)
+- **Tailwind CSS 4** with **shadcn/ui** (`base-mira` style) and **Hugeicons**
+- **Geist** and **Geist Mono** fonts from Fontsource
+- **Vite+** for dev, build, lint, format, and tests, with **Ultracite** (oxlint and oxfmt) rules
+- **Varlock** for typed environment variables
+- **Cloudflare Workers** (static assets) for hosting
 
-## Getting Started
+## Getting started
 
-First, install the dependencies:
+Install [Bun](https://bun.sh) and Node 24. Then run:
 
 ```bash
 bun install
-```
-
-Then, run the development server:
-
-```bash
 bun run dev
 ```
 
-Open [http://localhost:3001](http://localhost:3001) in your browser to see the web application.
+Open [http://localhost:3001](http://localhost:3001).
 
-## UI Customization
-
-React web apps in this stack share shadcn/ui primitives through `packages/ui`.
-
-- Change design tokens and global styles in `packages/ui/src/styles/globals.css`
-- Update shared primitives in `packages/ui/src/components/*`
-- Adjust shadcn aliases or style config in `packages/ui/components.json` and `apps/web/components.json`
-
-### Add more shared components
-
-Run this from the project root to add more primitives to the shared UI package:
-
-```bash
-npx shadcn@latest add accordion dialog popover sheet table -c packages/ui
-```
-
-Import shared components like this:
-
-```tsx
-import { Button } from "@my-website/ui/components/button";
-```
-
-### Add app-specific blocks
-
-If you want to add app-specific blocks instead of shared primitives, run the shadcn CLI from `apps/web`.
-
-## Environment Configuration
-
-Each app owns its environment schema in `.env.schema`. Varlock generates `src/env.ts` during installation; run `bun run env:generate` after changing a schema. Commit schemas, and keep secrets in ignored env files or your deployment platform.
-
-Import the generated `ENV` accessor in application code. Shared database and auth packages receive configuration or initialized clients from the application. See [Varlock's monorepo guide](https://varlock.dev/guides/monorepos/).
-
-Bun's automatic env loading is disabled in `bunfig.toml`; the framework integration or server bootstrap loads Varlock. Node deployments must include Varlock and its dependencies alongside the app schema.
-
-Run standalone Node/Bun tools that use Varlock from the owning app directory so they load that app's schema and env files. `env:generate` only generates TypeScript files; it does not initialize environment values in a subsequent command.
-
-## Git Hooks and Formatting
-
-- Optional native Vite+ hooks: `bun run hooks:setup`
-- Docs: [Vite+ commit hooks](https://viteplus.dev/guide/commit-hooks)
-- Run checks: `bun run check`
-
-## Project Structure
+## Project structure
 
 ```
-my-website/
-├── apps/
-│   ├── web/         # Frontend application (React + TanStack Router)
-├── packages/
-│   ├── ui/          # Shared shadcn/ui components and styles
+apps/
+  portfolio/   # The website (React + TanStack Router)
+packages/
+  ui/          # Shared shadcn/ui components, theme, and global styles
 ```
 
-## Available Scripts
+## Scripts
 
-- `bun run dev`: Start all applications in development mode
-- `bun run build`: Build all applications
-- `bun run dev:web`: Start only the web application
-- `bun run check-types`: Check TypeScript types across all apps
-- `bun run check`: Run Vite+ format/lint checks and workspace TypeScript checks
-- `bun run lint`: Run Vite+ lint checks
-- `bun run format`: Run Vite+ formatting
-- `bun run staged`: Run Vite+ checks against staged files
-- `bun run hooks:setup`: Install Vite+ native Git hooks with `vp config`
+| Script                 | What it does                                           |
+| ---------------------- | ------------------------------------------------------ |
+| `bun run dev`          | Start the dev server                                   |
+| `bun run build`        | Build the app                                          |
+| `bun run check`        | Run format and lint checks, type checks, and a build   |
+| `bun run test`         | Run the tests once                                     |
+| `bun run test:watch`   | Run the tests in watch mode                            |
+| `bun run format`       | Format the code                                        |
+| `bun run lint`         | Lint the code                                          |
+| `bun run env:generate` | Regenerate `src/env.ts` after you change `.env.schema` |
+
+## UI package
+
+- Change the theme and global styles in `packages/ui/src/styles/globals.css`.
+- Add a component from `packages/ui`:
+
+  ```bash
+  bunx shadcn add dialog
+  ```
+
+- Import a component in the app:
+
+  ```tsx
+  import { Toaster } from "@my-website/ui/components/sonner";
+  ```
+
+## Environment
+
+The app owns its schema in `apps/portfolio/.env.schema`. Varlock generates `src/env.ts` on install. Commit schemas. Keep secrets in ignored env files or in the deployment platform. See the [Varlock docs](https://varlock.dev).
+
+## SEO
+
+The site is a client-only SPA, so the metadata is static HTML. Edit the title, description, Open Graph tags, and JSON-LD in `apps/portfolio/index.html`. Icons and the web manifest are in `apps/portfolio/public/statics/seo/`. If the domain changes, update `index.html`, `robots.txt`, and `sitemap.xml` together.
+
+## CI and deploy
+
+GitHub Actions runs on every pull request and on every push to `main`.
+
+1. Format, lint, test, and type check with build run in parallel.
+2. On `main`, when all four pass, the deploy job publishes the built `dist` folder with Wrangler.
+
+The deploy job needs two repository secrets: `CLOUDFLARE_API_TOKEN` and `CLOUDFLARE_ACCOUNT_ID`. It uses the `production` environment. To deploy from your machine, run `wrangler login`, then `bun run deploy` in `apps/portfolio`.
+
+## Git hooks
+
+`bun install` runs `vp config`, which installs the hooks from `.vite-hooks/`. Pre-commit runs `vp staged`. Pre-push runs `vp check --no-fmt --no-lint`.
+
+## Commits
+
+Use `type: description` with no scope, body, or footer. Mark a breaking change as `type!: description`. Name branches `<type>/<short-kebab-name>`.
