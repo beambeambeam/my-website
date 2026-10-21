@@ -29,7 +29,7 @@
     "format": "vp fmt",
     "format:check": "vp fmt --check",
     "staged": "vp staged",
-    "hooks:setup": "vp config",
+    "prepare": "vp config",
     "dev:portfolio": "vp run --filter portfolio dev",
     "env:generate": "varlock codegen --path ./apps/portfolio/",
     "postinstall": "varlock codegen --path ./apps/portfolio/"
