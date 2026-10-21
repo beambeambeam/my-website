@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
+import { GradualBlur } from "@/components/gradual-blur";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
@@ -40,6 +41,12 @@ const HomeComponent = () => {
       <div aria-hidden className="h-[300vh]" />
       {!headerInView && (
         <>
+          <GradualBlur
+            position="top"
+            height="6rem"
+            tint="color-mix(in oklab, var(--background) 60%, transparent)"
+            className="fixed inset-x-0 top-0 z-10 lg:hidden"
+          />
           <ProfileBar {...profile} className="fixed inset-x-0 top-0 z-10 lg:hidden" />
           <div className="pointer-events-none fixed inset-x-0 top-4 z-10 hidden lg:block">
             <div className="mx-auto w-full max-w-10xl px-4 sm:px-6">
