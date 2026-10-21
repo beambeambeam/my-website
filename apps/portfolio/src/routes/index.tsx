@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
 import { GradualBlur } from "@/components/gradual-blur";
+import { LibsToolsCard } from "@/components/libs-tools/card";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
@@ -37,6 +38,9 @@ const HomeComponent = () => {
           </div>
         </div>
       </header>
+      <section className="mx-auto mt-8 w-full max-w-10xl px-4 sm:px-6">
+        <LibsToolsCard className="max-w-3xl" />
+      </section>
       {/* Temporary scroll space to preview the profile card. */}
       <div aria-hidden className="h-[300vh]" />
       {!headerInView && (
