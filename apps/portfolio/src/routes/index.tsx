@@ -22,9 +22,9 @@ const HomeComponent = () => {
 
   return (
     <main>
-      <header ref={headerRef}>
-        <ProfileBanner src={profile.bannerSrc} alt="Profile banner" />
-        <div className="@container mx-auto w-full max-w-10xl px-4 sm:px-6">
+      <ProfileBanner src={profile.bannerSrc} alt="Profile banner" />
+      <div className="@container mx-auto grid w-full max-w-10xl gap-x-6 px-4 sm:px-6 lg:grid-cols-[max-content_minmax(0,1fr)]">
+        <header ref={headerRef} className="min-w-0 self-start">
           <ProfileAvatar
             src={profile.avatarSrc}
             alt={profile.name}
@@ -36,11 +36,11 @@ const HomeComponent = () => {
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{profile.name}</h1>
             <p className="text-muted-foreground sm:text-lg">{profile.title}</p>
           </div>
-        </div>
-      </header>
-      <section className="mx-auto mt-8 w-full max-w-10xl px-4 sm:px-6">
-        <LibsToolsCard className="max-w-3xl" />
-      </section>
+        </header>
+        <section className="mt-8 min-w-0">
+          <LibsToolsCard className="w-fit" />
+        </section>
+      </div>
       {/* Temporary scroll space to preview the profile card. */}
       <div aria-hidden className="h-[300vh]" />
       {!headerInView && (
