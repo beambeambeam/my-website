@@ -3,9 +3,9 @@ import { cn } from "@my-website/ui/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
-import { toolCategories } from "@/components/libs-tools/data";
-import type { Tool } from "@/components/libs-tools/data";
-import { PixelLogo } from "@/components/libs-tools/pixel-logo";
+import { toolCategories } from "@/features/lib-tools/data";
+import type { Tool } from "@/features/lib-tools/data";
+import { PixelLogo } from "@/features/lib-tools/pixel-logo";
 
 interface HoveredTool {
   category: string;

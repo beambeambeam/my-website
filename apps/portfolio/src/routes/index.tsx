@@ -2,11 +2,11 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
 import { GradualBlur } from "@/components/gradual-blur";
-import { LibsToolsCard } from "@/components/libs-tools/card";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
+import { LibsToolsCard } from "@/features/lib-tools/card";
 import { useInView } from "@/hooks/use-in-view";
 
 const profile = {

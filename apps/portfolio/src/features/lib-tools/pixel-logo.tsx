@@ -2,7 +2,7 @@ import { useAnimate, useReducedMotion } from "motion/react";
 import type { AnimationPlaybackControls } from "motion/react";
 import { useEffect, useState } from "react";
 
-import type { Tool } from "@/components/libs-tools/data";
+import type { Tool } from "@/features/lib-tools/data";
 
 /** Grid sizes of the pixel steps, from coarse to fine. */
 const STEPS = [4, 8, 20];
