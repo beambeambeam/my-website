@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
+import { DiaTextReveal } from "@/components/dia-text-reveal";
 import { GradualBlur } from "@/components/gradual-blur";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
@@ -33,8 +34,12 @@ const HomeComponent = () => {
             className="-mt-[calc(var(--avatar-size)/3)]"
           />
           <div className="mt-4 space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">{profile.name}</h1>
-            <p className="text-muted-foreground sm:text-lg">{profile.title}</p>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+              <DiaTextReveal text={profile.name} />
+            </h1>
+            <p className="text-muted-foreground sm:text-lg">
+              <DiaTextReveal text={profile.title} delay={0.3} />
+            </p>
           </div>
         </header>
         <section className="mt-8 min-w-0">
