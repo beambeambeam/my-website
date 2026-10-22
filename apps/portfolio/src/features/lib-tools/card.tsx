@@ -1,4 +1,3 @@
-import { Card } from "@my-website/ui/components/card";
 import { cn } from "@my-website/ui/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
@@ -25,10 +24,10 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
   const [hovered, setHovered] = useState<HoveredTool | null>(null);
 
   return (
-    <Card className={cn("gap-0 py-0", className)}>
+    <div className={className}>
       <h2 className="sr-only">Libs &amp; Tools</h2>
       <div className="grid md:grid-cols-[max-content_minmax(0,1fr)]">
-        <div className="flex w-fit flex-col p-4 md:pt-5">
+        <div className="flex w-fit flex-col p-4">
           <p className="text-xs text-muted-foreground uppercase">I work a lot with</p>
           <div
             aria-hidden="true"
@@ -56,9 +55,12 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-4 border-t p-4 md:border-t-0 md:border-l">
+        <div className="flex flex-col border-t md:border-t-0 md:border-l">
           {toolCategories.map((category) => (
-            <div key={category.label} className="flex flex-col gap-1.5">
+            <div
+              key={category.label}
+              className="flex flex-col gap-1.5 border-b p-4 last:border-b-0"
+            >
               <h3
                 className={cn(
                   "text-xs transition-colors duration-200",
@@ -92,6 +94,6 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
           ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 };

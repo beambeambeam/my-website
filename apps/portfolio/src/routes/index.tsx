@@ -24,30 +24,34 @@ const HomeComponent = () => {
   return (
     <main>
       <ProfileBanner src={profile.bannerSrc} alt="Profile banner" />
-      <div className="@container mx-auto grid w-full max-w-10xl gap-x-6 px-4 sm:px-6 lg:grid-cols-[max-content_minmax(0,1fr)]">
-        <header ref={headerRef} className="min-w-0 self-start">
-          <ProfileAvatar
-            src={profile.avatarSrc}
-            alt={profile.name}
-            fallback={profile.name.charAt(0)}
-            size="max(4.8rem,14cqw)"
-            className="-mt-[calc(var(--avatar-size)/3)]"
-          />
-          <div className="mt-4 space-y-1">
-            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-              <DiaTextReveal text={profile.name} />
-            </h1>
-            <p className="text-muted-foreground sm:text-lg">
-              <DiaTextReveal text={profile.title} delay={0.3} />
-            </p>
+      <div className="mx-auto w-full max-w-10xl border-r">
+        <div className="@container grid gap-x-6 pl-4 sm:pl-6 lg:grid-cols-[max-content_minmax(0,1fr)]">
+          <header ref={headerRef} className="min-w-0 self-start pr-4 sm:pr-6 lg:pr-0">
+            <ProfileAvatar
+              src={profile.avatarSrc}
+              alt={profile.name}
+              fallback={profile.name.charAt(0)}
+              size="max(4.8rem,14cqw)"
+              className="-mt-[calc(var(--avatar-size)/3)]"
+            />
+            <div className="mt-4 space-y-1">
+              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
+                <DiaTextReveal text={profile.name} />
+              </h1>
+              <p className="text-muted-foreground sm:text-lg">
+                <DiaTextReveal text={profile.title} />
+              </p>
+            </div>
+          </header>
+          <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
+            <section className="border-y lg:mt-8">
+              <LibsToolsCard className="w-fit max-w-full border-r" />
+            </section>
+            {/* Temporary scroll space to preview the profile card. */}
+            <div aria-hidden className="h-[300vh]" />
           </div>
-        </header>
-        <section className="mt-8 min-w-0">
-          <LibsToolsCard className="w-fit" />
-        </section>
+        </div>
       </div>
-      {/* Temporary scroll space to preview the profile card. */}
-      <div aria-hidden className="h-[300vh]" />
       {!headerInView && (
         <>
           <GradualBlur
