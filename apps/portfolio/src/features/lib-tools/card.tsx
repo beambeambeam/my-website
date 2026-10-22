@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { toolCategories } from "@/features/lib-tools/data";
 import type { Tool } from "@/features/lib-tools/data";
+import { PixelLabel } from "@/features/lib-tools/pixel-label";
 import { PixelLogo } from "@/features/lib-tools/pixel-logo";
 
 interface HoveredTool {
@@ -39,18 +40,12 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
               </span>
             ))}
             <div className="col-start-1 row-start-1">
-              <AnimatePresence initial={false} mode="wait">
-                <motion.span
+              <AnimatePresence mode="wait">
+                <PixelLabel
                   key={hovered?.tool.name ?? "default"}
-                  initial={{ y: 5 }}
-                  animate={{ y: 0 }}
-                  exit={{ y: -20 }}
-                  transition={{ duration: 0.1 }}
-                  className="block"
-                  style={{ color: hovered?.tool.color }}
-                >
-                  {(hovered?.tool.name ?? "these tools").replaceAll(" ", "-")}
-                </motion.span>
+                  text={(hovered?.tool.name ?? "these tools").replaceAll(" ", "-")}
+                  color={hovered?.tool.color}
+                />
               </AnimatePresence>
             </div>
           </div>
