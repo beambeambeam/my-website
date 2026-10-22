@@ -1,6 +1,7 @@
 import { Card, CardContent, CardDescription, CardTitle } from "@my-website/ui/components/card";
 import { cn } from "@my-website/ui/lib/utils";
 
+import { DiaTextReveal } from "@/components/dia-text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
 
@@ -23,8 +24,12 @@ export const ProfileCard = ({ name, title, avatarSrc, bannerSrc, className }: Pr
         size="4.5rem"
         className="-mt-[calc(var(--avatar-size)/2)] ring-card"
       />
-      <CardTitle className="mt-2 text-lg font-semibold tracking-tight">{name}</CardTitle>
-      <CardDescription className="text-sm">{title}</CardDescription>
+      <CardTitle className="mt-2 text-lg font-semibold tracking-tight">
+        <DiaTextReveal text={name} />
+      </CardTitle>
+      <CardDescription className="text-sm">
+        <DiaTextReveal text={title} />
+      </CardDescription>
     </CardContent>
   </Card>
 );
