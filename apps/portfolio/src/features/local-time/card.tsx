@@ -49,7 +49,7 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
     <div
       style={style}
       className={cn(
-        "relative isolate grid w-144 max-w-full grid-cols-2 text-(--sky-ink)",
+        "relative isolate grid w-144 max-w-full text-(--sky-ink) sm:grid-cols-2",
         className,
       )}
     >
