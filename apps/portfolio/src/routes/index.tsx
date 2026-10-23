@@ -9,6 +9,7 @@ import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
+import { LocalTimeCard } from "@/features/local-time/card";
 import { useInView } from "@/hooks/use-in-view";
 
 const profile = {
@@ -46,6 +47,11 @@ const HomeComponent = () => {
           </header>
           <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
             <section className="border-y lg:mt-8">
+              <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
+                <LocalTimeCard className="border-y border-r lg:border-l" />
+              </PixelatedBlockReveal>
+            </section>
+            <section className="border-b">
               <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
                 <LibsToolsCard className="border-y border-r lg:border-l" />
               </PixelatedBlockReveal>
