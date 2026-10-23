@@ -1,11 +1,8 @@
 import { LensClock } from "@my-website/ui/components/lens-clock";
 import { cn } from "@my-website/ui/lib/utils";
-import { AnimatePresence } from "motion/react";
 import type { CSSProperties } from "react";
-import { useState } from "react";
 
 import { PixelatedGradient } from "@/components/pixelated/gradient";
-import { PixelatedTextSwap } from "@/components/pixelated/text-swap";
 import { skyAt } from "@/features/local-time/sky";
 import { useZonedTime } from "@/features/local-time/use-zoned-time";
 
@@ -13,6 +10,9 @@ import { useZonedTime } from "@/features/local-time/use-zoned-time";
 const TIME_ZONE = "Asia/Bangkok";
 
 const ZONE_LABEL = "GMT+7";
+
+/** Central Bangkok. */
+const COORDINATES = "13.7563° N, 100.5018° E";
 
 /** Map of central Bangkok from OpenStreetMap. See `public/statics/maps/README.md`. */
 const MAP_SRC = "/statics/maps/bangkok.svg";
@@ -34,7 +34,6 @@ interface LocalTimeCardProps {
 }
 
 export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
-  const [hovered, setHovered] = useState(false);
   const time = useZonedTime(TIME_ZONE);
   const sky = skyAt(Number(time.slice(0, 2)));
 
@@ -53,12 +52,6 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
         "relative isolate grid w-144 max-w-full grid-cols-2 text-(--sky-ink)",
         className,
       )}
-      onPointerEnter={() => {
-        setHovered(true);
-      }}
-      onPointerLeave={() => {
-        setHovered(false);
-      }}
     >
       <PixelatedGradient base={sky.base} glows={sky.glows} className="-z-10" />
       <h2 className="sr-only">
@@ -74,6 +67,11 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
         <p className="absolute inset-0 grid place-items-center text-lg font-semibold [text-shadow:0_0_6px_var(--sky-base),0_0_2px_var(--sky-base)]">
           Bangkok
         </p>
+        <div className="absolute top-0 left-0 p-4">
+          <p className="text-xs text-(--sky-muted) uppercase">I&apos;m based in</p>
+          <p className="font-mono text-sm font-bold">{COORDINATES}</p>
+          <p className="font-mono text-sm font-bold">{ZONE_LABEL}</p>
+        </div>
         <a
           href="https://www.openstreetmap.org/copyright"
           target="_blank"
@@ -83,29 +81,11 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
           © OpenStreetMap
         </a>
       </div>
-      <div className="relative">
-        <LensClock
-          timeZone={TIME_ZONE}
-          theme="light"
-          className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
-        />
-        <p
-          aria-hidden="true"
-          className="absolute top-0 left-0 p-4 text-xs text-(--sky-muted) uppercase"
-        >
-          My local time
-        </p>
-        <div aria-hidden="true" className="absolute bottom-0 left-0 p-4">
-          <div className="h-7 font-mono text-lg font-bold">
-            <AnimatePresence mode="wait">
-              <PixelatedTextSwap
-                key={hovered ? time : ZONE_LABEL}
-                text={hovered ? time : ZONE_LABEL}
-              />
-            </AnimatePresence>
-          </div>
-        </div>
-      </div>
+      <LensClock
+        timeZone={TIME_ZONE}
+        theme="light"
+        className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
+      />
     </div>
   );
 };
