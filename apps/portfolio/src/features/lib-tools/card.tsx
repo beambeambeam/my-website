@@ -58,10 +58,8 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
             >
               <h3
                 className={cn(
-                  "text-xs transition-colors duration-200",
-                  hovered !== null &&
-                    hovered.category !== category.label &&
-                    "text-muted-foreground",
+                  "text-xs transition-opacity duration-200",
+                  hovered !== null && hovered.category !== category.label && "opacity-30",
                 )}
               >
                 {category.label}
@@ -70,7 +68,10 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
                 {category.tools.map((tool) => (
                   <motion.li
                     key={tool.name}
-                    className="size-10"
+                    className={cn(
+                      "size-10 transition-opacity duration-200",
+                      hovered !== null && hovered.tool.name !== tool.name && "opacity-30",
+                    )}
                     whileHover={{ scale: 1.1 }}
                     transition={{ duration: 0.15 }}
                     onHoverStart={() => {

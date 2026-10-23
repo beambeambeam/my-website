@@ -3,30 +3,38 @@ import type { AnimationPlaybackControls } from "motion/react";
 
 export const DIA_COLORS = ["#f0abfc", "#f472b6", "#fb923c", "#facc15", "#a3e635"];
 
-/** Pixel block sizes of the steps, from coarse to fine, as a fraction of the font size. */
+/** Pixel block sizes of the steps, from coarse to fine, as a fraction of the source unit. */
 const STEPS = [0.3, 0.15, 0.075];
 
 /** Maximum random delay of a cell, as a fraction of the step width. */
 const CELL_JITTER = 0.6;
 
-/** Minimum cell alpha (0–255) to count as part of the text. */
+/** Minimum cell alpha (0–255) to count as part of the shape. */
 const ALPHA_THRESHOLD = 64;
 
 /** Direction the sweep front moves in. */
 export type SweepDirection = "right" | "up" | "down";
 
+/** Shape that the pixel blocks follow. */
+export interface SweepSource {
+  /** Base size in px for the pixel blocks and step zones. Defaults to the shorter element side. */
+  unit?: number;
+  /** Paints the shape in an opaque color, in element coordinates. */
+  paint?: (ctx: CanvasRenderingContext2D, width: number, height: number) => void;
+}
+
 interface Cell {
   x: number;
   y: number;
   size: number;
-  /** Distance of the cell center along the sweep direction. */
+  /** Distance of the cell center along the sweep direction, plus a random delay. */
   position: number;
 }
 
 interface Layout {
   width: number;
   height: number;
-  /** Distance the front travels across the text. */
+  /** Distance the front travels across the element. */
   length: number;
   stepWidth: number;
   /** Cells of each step, from coarse to fine. */
@@ -45,17 +53,86 @@ const transformText = (text: string, transform: string) => {
   return text;
 };
 
+/** Returns a source that paints `text` with the font of `element`. */
+export const getTextSource = async (element: HTMLElement, text: string): Promise<SweepSource> => {
+  await document.fonts.ready;
+
+  const style = getComputedStyle(element);
+  const shownText = transformText(text, style.textTransform);
+
+  return {
+    unit: Number(style.fontSize.replace("px", "")),
+    paint: (ctx, _width, height) => {
+      ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+      ctx.letterSpacing = style.letterSpacing === "normal" ? "0px" : style.letterSpacing;
+      const metrics = ctx.measureText(shownText);
+      const ascent = metrics.fontBoundingBoxAscent;
+      const descent = metrics.fontBoundingBoxDescent;
+      ctx.fillText(shownText, 0, (height - ascent - descent) / 2 + ascent);
+    },
+  };
+};
+
+const imageCache = new Map<string, Promise<HTMLImageElement | null>>();
+
+const loadImage = async (src: string) => {
+  const image = new Image();
+  image.src = src;
+
+  try {
+    await image.decode();
+
+    return image;
+  } catch {
+    return null;
+  }
+};
+
+/** Returns a source that paints the image at `src`, contained and centered. */
+export const getImageSource = async (src: string | null): Promise<SweepSource> => {
+  if (src === null) {
+    return {};
+  }
+
+  let image = imageCache.get(src);
+
+  if (image === undefined) {
+    image = loadImage(src);
+    imageCache.set(src, image);
+  }
+
+  const loaded = await image;
+
+  if (loaded === null) {
+    return {};
+  }
+
+  return {
+    paint: (ctx, width, height) => {
+      const scale = Math.min(width / loaded.naturalWidth, height / loaded.naturalHeight);
+      const drawWidth = loaded.naturalWidth * scale;
+      const drawHeight = loaded.naturalHeight * scale;
+      ctx.drawImage(
+        loaded,
+        (width - drawWidth) / 2,
+        (height - drawHeight) / 2,
+        drawWidth,
+        drawHeight,
+      );
+    },
+  };
+};
+
 const measure = (
   element: HTMLElement,
-  text: string,
+  source: SweepSource,
   direction: SweepDirection,
   stepSize: number,
 ): Layout => {
-  const style = getComputedStyle(element);
-  const { width, height } = element.getBoundingClientRect();
-  const fontSize = Number(style.fontSize.replace("px", ""));
-  const stepWidth = fontSize * stepSize;
-  const shownText = transformText(text, style.textTransform);
+  const width = element.offsetWidth;
+  const height = element.offsetHeight;
+  const unit = source.unit ?? Math.min(width, height);
+  const stepWidth = unit * stepSize;
 
   const getPosition = (x: number, y: number) => {
     if (direction === "right") {
@@ -66,7 +143,7 @@ const measure = (
   };
 
   const steps = STEPS.map((ratio) => {
-    const size = Math.max(1, Math.round(fontSize * ratio));
+    const size = Math.max(1, Math.round(unit * ratio));
     const columns = Math.ceil(width / size);
     const rows = Math.ceil(height / size);
     const canvas = document.createElement("canvas");
@@ -74,17 +151,12 @@ const measure = (
     canvas.height = rows;
     const ctx = canvas.getContext("2d", { willReadFrequently: true });
 
-    if (ctx === null) {
+    if (ctx === null || source.paint === undefined) {
       return [];
     }
 
     ctx.scale(1 / size, 1 / size);
-    ctx.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
-    ctx.letterSpacing = style.letterSpacing === "normal" ? "0px" : style.letterSpacing;
-    const metrics = ctx.measureText(shownText);
-    const ascent = metrics.fontBoundingBoxAscent;
-    const descent = metrics.fontBoundingBoxDescent;
-    ctx.fillText(shownText, 0, (height - ascent - descent) / 2 + ascent);
+    source.paint(ctx, width, height);
 
     const { data } = ctx.getImageData(0, 0, columns, rows);
     const cells: Cell[] = [];
@@ -105,7 +177,7 @@ const measure = (
   return { width, height, length: direction === "right" ? width : height, stepWidth, steps };
 };
 
-/** Returns the clip path that hides `hidden` of the text, from the end of the sweep back. */
+/** Returns the clip path that hides `hidden` of the element, from the end of the sweep back. */
 const getClipPath = (direction: SweepDirection, hidden: string) => {
   if (direction === "right") {
     return `inset(0 ${hidden} 0 0)`;
@@ -113,10 +185,6 @@ const getClipPath = (direction: SweepDirection, hidden: string) => {
 
   return direction === "down" ? `inset(0 0 ${hidden} 0)` : `inset(${hidden} 0 0 0)`;
 };
-
-/** Returns the clip path that shows the text where the position is below `sharp`. */
-const getSharpClipPath = (direction: SweepDirection, layout: Layout, sharp: number) =>
-  getClipPath(direction, `${Math.min(layout.length, Math.max(0, layout.length - sharp))}px`);
 
 const createGradient = (
   ctx: CanvasRenderingContext2D,
@@ -134,7 +202,7 @@ const createGradient = (
     : ctx.createLinearGradient(0, layout.height - front, 0, layout.height - sharp);
 };
 
-/** Draws the pixel zone behind `front` and returns the position where sharp text starts. */
+/** Draws the pixel zone behind `front` and returns the position where the sharp element starts. */
 const draw = (
   ctx: CanvasRenderingContext2D,
   direction: SweepDirection,
@@ -167,85 +235,115 @@ const draw = (
   return sharp;
 };
 
-export interface SweepOptions {
-  text: string;
+export interface PixelSweepOptions {
   direction: SweepDirection;
+  colors?: string[];
+  /** Width of each pixel step zone, as a multiple of the source unit. */
+  stepSize?: number;
+}
+
+export interface PixelSweep {
+  /** Shows the sweep at `progress`: 0 hides the element, 1 shows all of it. */
+  render: (progress: number) => void;
+  clear: () => void;
+}
+
+/**
+ * Prepares a sweep of colored pixel blocks that sharpen into `element`. `canvas` must cover
+ * `element`.
+ */
+export const createPixelSweep = (
+  element: HTMLElement,
+  canvas: HTMLCanvasElement,
+  source: SweepSource,
+  { direction, colors = DIA_COLORS, stepSize = 1.2 }: PixelSweepOptions,
+): PixelSweep | null => {
+  const ctx = canvas.getContext("2d");
+
+  if (ctx === null) {
+    return null;
+  }
+
+  const layout = measure(element, source, direction, stepSize);
+  const ratio = window.devicePixelRatio;
+  canvas.width = Math.ceil(layout.width * ratio);
+  canvas.height = Math.ceil(layout.height * ratio);
+  ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+
+  const end = layout.length + layout.stepWidth * (layout.steps.length + CELL_JITTER);
+
+  const clear = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const render = (progress: number) => {
+    if (progress <= 0 || progress >= 1) {
+      clear();
+      element.style.clipPath = progress <= 0 ? getClipPath(direction, "100%") : "none";
+
+      return;
+    }
+
+    const sharp = draw(ctx, direction, layout, progress * end, colors);
+    const hidden = Math.min(layout.length, Math.max(0, layout.length - sharp));
+    element.style.clipPath = getClipPath(direction, `${hidden}px`);
+  };
+
+  return { render, clear };
+};
+
+export interface SweepOptions extends PixelSweepOptions {
+  text: string;
   /** Plays the sweep backward: the sharp text breaks into pixels and goes away. */
   reverse?: boolean;
-  colors?: string[];
   /** Duration in seconds. */
   duration: number;
   /** Delay before the sweep starts, in seconds. */
   delay?: number;
-  /** Width of each pixel step zone, as a multiple of the font size. */
-  stepSize?: number;
   onComplete?: () => void;
 }
 
-/**
- * Sweeps colored pixel blocks over the text element and sharpens them into the text. Draws on
- * `canvas`, which must cover the text element. Returns a function that stops the sweep.
- */
+/** Plays a pixel sweep over the text element once. Returns a function that stops it. */
 export const sweep = (
   textElement: HTMLElement,
   canvas: HTMLCanvasElement,
-  {
-    text,
-    direction,
-    reverse = false,
-    colors = DIA_COLORS,
-    duration,
-    delay = 0,
-    stepSize = 1.2,
-    onComplete,
-  }: SweepOptions,
+  { text, reverse = false, duration, delay = 0, onComplete, ...options }: SweepOptions,
 ) => {
-  const ctx = canvas.getContext("2d");
   let cancelled = false;
+  let pixelSweep: PixelSweep | null = null;
   let controls: AnimationPlaybackControls | undefined;
 
-  textElement.style.clipPath = reverse ? "none" : getClipPath(direction, "100%");
+  textElement.style.clipPath = reverse ? "none" : getClipPath(options.direction, "100%");
 
-  const run = async (context: CanvasRenderingContext2D) => {
-    await document.fonts.ready;
+  const run = async () => {
+    const source = await getTextSource(textElement, text);
 
     if (cancelled) {
       return;
     }
 
-    const layout = measure(textElement, text, direction, stepSize);
-    const ratio = window.devicePixelRatio;
-    canvas.width = Math.ceil(layout.width * ratio);
-    canvas.height = Math.ceil(layout.height * ratio);
-    context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    pixelSweep = createPixelSweep(textElement, canvas, source, options);
 
-    const end = layout.length + layout.stepWidth * (layout.steps.length + CELL_JITTER);
+    if (pixelSweep === null) {
+      onComplete?.();
 
-    controls = animate(reverse ? end : 0, reverse ? 0 : end, {
+      return;
+    }
+
+    controls = animate(reverse ? 1 : 0, reverse ? 0 : 1, {
       duration,
       delay,
       ease: "easeInOut",
-      onUpdate: (front) => {
-        const sharp = draw(context, direction, layout, front, colors);
-        textElement.style.clipPath = getSharpClipPath(direction, layout, sharp);
-      },
-      onComplete: () => {
-        context.clearRect(0, 0, canvas.width, canvas.height);
-        textElement.style.clipPath = reverse ? getClipPath(direction, "100%") : "none";
-        onComplete?.();
-      },
+      onUpdate: pixelSweep.render,
+      onComplete,
     });
   };
 
-  if (ctx === null) {
-    onComplete?.();
-  } else {
-    void run(ctx);
-  }
+  void run();
 
   return () => {
     cancelled = true;
     controls?.stop();
-    ctx?.clearRect(0, 0, canvas.width, canvas.height);
+    pixelSweep?.clear();
   };
 };
