@@ -1,46 +1,82 @@
 import { LensClock } from "@my-website/ui/components/lens-clock";
 import { cn } from "@my-website/ui/lib/utils";
+import { AnimatePresence } from "motion/react";
+import type { CSSProperties } from "react";
+import { useState } from "react";
 
 import { PixelatedGradient } from "@/components/pixelated/gradient";
-import type { GradientGlow } from "@/components/pixelated/gradient";
+import { PixelatedTextSwap } from "@/components/pixelated/text-swap";
+import { skyAt } from "@/features/local-time/sky";
+import { useZonedTime } from "@/features/local-time/use-zoned-time";
 
 /** Bangkok is UTC+7 all year, with no daylight saving time. */
 const TIME_ZONE = "Asia/Bangkok";
 
-const DUSK_BASE = "#ff9470";
+const ZONE_LABEL = "GMT+7";
 
-const DUSK_GLOWS: GradientGlow[] = [
-  { color: "#ff6a45", x: 0.1, y: 0.2, radius: 0.6 },
-  { color: "#ffe08a", x: 0.85, y: 0.1, radius: 0.5 },
-  { color: "#ffb257", x: 0.95, y: 0.95, radius: 0.6 },
-  { color: "#ff9f8a", x: 0.3, y: 0.85, radius: 0.4 },
-];
+type SkyStyle = CSSProperties & {
+  "--sky-ink": string;
+  "--sky-muted": string;
+  "--sky-accent": string;
+  "--sky-stripe": string;
+};
 
-/**
- * Dark ink, because white fails contrast on every dusk color. Minimum contrast over the gradient:
- * ink #1f0d06 6.6:1, muted #4a1f0e 4.9:1, second hand #7a1400 3.8:1 (graphics need 3:1).
- */
-const DUSK_CLOCK =
-  "bg-none [--lc-accent:#7a1400] [--lc-lume:#ffe9c7] [--lc-tick:#4a1f0e] [--lc-label:#4a1f0e] [--lc-spoke:#1f0d06] [--lc-hand:#1f0d06] [--lc-hand-edge:transparent] [--lc-pivot-from:#4a1f0e] [--lc-pivot-to:#1f0d06] [--lc-sleeve:#1f0d06]";
+/** Points the clock palette at the current sky colors. */
+const SKY_CLOCK =
+  "bg-none [--lc-accent:var(--sky-accent)] [--lc-lume:var(--sky-stripe)] [--lc-tick:var(--sky-muted)] [--lc-label:var(--sky-muted)] [--lc-spoke:var(--sky-ink)] [--lc-hand:var(--sky-ink)] [--lc-hand-edge:transparent] [--lc-pivot-from:var(--sky-muted)] [--lc-pivot-to:var(--sky-ink)] [--lc-sleeve:var(--sky-ink)]";
 
 interface LocalTimeCardProps {
   className?: string;
 }
 
-export const LocalTimeCard = ({ className }: LocalTimeCardProps) => (
-  <div className={cn("relative isolate text-[#1f0d06]", className)}>
-    <PixelatedGradient base={DUSK_BASE} glows={DUSK_GLOWS} className="-z-10" />
-    <h2 className="sr-only">Local time</h2>
-    <div className="flex w-56 flex-col">
-      <div className="p-4">
-        <p className="text-xs text-[#4a1f0e] uppercase">My local time</p>
-        <p className="font-mono text-lg font-bold uppercase">GMT+7</p>
-      </div>
+export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
+  const [hovered, setHovered] = useState(false);
+  const time = useZonedTime(TIME_ZONE);
+  const sky = skyAt(Number(time.slice(0, 2)));
+
+  const style: SkyStyle = {
+    "--sky-ink": sky.ink,
+    "--sky-muted": sky.muted,
+    "--sky-accent": sky.accent,
+    "--sky-stripe": sky.stripe,
+  };
+
+  return (
+    <div
+      style={style}
+      className={cn("relative isolate w-72 text-(--sky-ink)", className)}
+      onPointerEnter={() => {
+        setHovered(true);
+      }}
+      onPointerLeave={() => {
+        setHovered(false);
+      }}
+    >
+      <PixelatedGradient base={sky.base} glows={sky.glows} className="-z-10" />
+      <h2 className="sr-only">
+        Local time, {ZONE_LABEL}, {sky.name.toLowerCase()} sky
+      </h2>
       <LensClock
         timeZone={TIME_ZONE}
         theme="light"
-        className={cn("w-full rounded-none shadow-none", DUSK_CLOCK)}
+        className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
       />
+      <p
+        aria-hidden="true"
+        className="absolute top-0 left-0 p-4 text-xs text-(--sky-muted) uppercase"
+      >
+        My local time
+      </p>
+      <div aria-hidden="true" className="absolute bottom-0 left-0 p-4">
+        <div className="h-7 font-mono text-lg font-bold">
+          <AnimatePresence mode="wait">
+            <PixelatedTextSwap
+              key={hovered ? time : ZONE_LABEL}
+              text={hovered ? time : ZONE_LABEL}
+            />
+          </AnimatePresence>
+        </div>
+      </div>
     </div>
-  </div>
-);
+  );
+};
