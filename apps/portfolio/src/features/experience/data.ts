@@ -34,3 +34,23 @@ export const experiences: Experience[] = [
     image: PLACEHOLDER_IMAGE,
   },
 ];
+
+/** Education, from the resume in `my-cv-resume/src/resume.tex`. */
+export interface Education {
+  school: string;
+  period: string;
+  degree: string;
+  note: string;
+  /** Shown when the row expands. */
+  image: string;
+}
+
+export const educations: Education[] = [
+  {
+    school: "KMUTT",
+    period: "Exp. May 2028",
+    degree: "Bachelor of Computer Engineering",
+    note: "Petchra Pra Jom Klao Scholarship",
+    image: PLACEHOLDER_IMAGE,
+  },
+];
