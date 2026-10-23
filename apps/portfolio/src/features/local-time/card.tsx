@@ -10,12 +10,12 @@ interface LocalTimeCardProps {
 export const LocalTimeCard = ({ className }: LocalTimeCardProps) => (
   <div className={className}>
     <h2 className="sr-only">Local time</h2>
-    <div className="flex flex-col gap-4 p-4">
-      <div>
+    <div className="flex w-56 flex-col">
+      <div className="p-4">
         <p className="text-xs text-muted-foreground uppercase">My local time</p>
         <p className="font-mono text-lg font-bold uppercase">GMT+7</p>
       </div>
-      <LensClock timeZone={TIME_ZONE} className="w-48" />
+      <LensClock timeZone={TIME_ZONE} className="w-full rounded-none shadow-none" />
     </div>
   </div>
 );
