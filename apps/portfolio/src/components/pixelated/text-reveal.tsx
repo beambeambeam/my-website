@@ -3,9 +3,9 @@ import { useInView, useReducedMotion } from "motion/react";
 import type { UseInViewOptions } from "motion/react";
 import { useEffect, useRef } from "react";
 
-import { DIA_COLORS, sweep } from "@/lib/pixel-sweep";
+import { DIA_COLORS, getTextSource, sweep } from "@/lib/pixel-sweep";
 
-interface DiaTextRevealProps {
+interface PixelatedTextRevealProps {
   text: string;
   /** Gradient stop colors of the pixel zone, from the leading edge back. */
   colors?: string[];
@@ -20,7 +20,7 @@ interface DiaTextRevealProps {
 }
 
 /** Sweeps the text in from left to right: colored pixel blocks sharpen into the text. */
-export const DiaTextReveal = ({
+export const PixelatedTextReveal = ({
   text,
   colors = DIA_COLORS,
   duration = 1.5,
@@ -29,7 +29,7 @@ export const DiaTextReveal = ({
   once = true,
   inViewMargin,
   className,
-}: DiaTextRevealProps) => {
+}: PixelatedTextRevealProps) => {
   const textRef = useRef<HTMLSpanElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const inView = useInView(textRef, { once, margin: inViewMargin });
@@ -42,7 +42,13 @@ export const DiaTextReveal = ({
 
     const stop =
       active && !reduceMotion && textElement !== null && canvas !== null
-        ? sweep(textElement, canvas, { text, direction: "right", colors, duration, delay })
+        ? sweep(textElement, canvas, {
+            getSource: async () => await getTextSource(textElement, text),
+            direction: "right",
+            colors,
+            duration,
+            delay,
+          })
         : null;
 
     return () => {

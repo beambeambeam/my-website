@@ -1,8 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
-import { DiaTextReveal } from "@/components/dia-text-reveal";
 import { GradualBlur } from "@/components/gradual-blur";
+import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
+import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
@@ -36,16 +37,18 @@ const HomeComponent = () => {
             />
             <div className="mt-4 space-y-1">
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                <DiaTextReveal text={profile.name} />
+                <PixelatedTextReveal text={profile.name} />
               </h1>
               <p className="text-muted-foreground sm:text-lg">
-                <DiaTextReveal text={profile.title} />
+                <PixelatedTextReveal text={profile.title} />
               </p>
             </div>
           </header>
           <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
             <section className="border-y lg:mt-8">
-              <LibsToolsCard className="w-fit max-w-full border-r" />
+              <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
+                <LibsToolsCard className="border-y border-r lg:border-l" />
+              </PixelatedBlockReveal>
             </section>
             {/* Temporary scroll space to preview the profile card. */}
             <div aria-hidden className="h-[300vh]" />

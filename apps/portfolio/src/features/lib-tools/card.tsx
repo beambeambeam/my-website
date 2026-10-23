@@ -2,10 +2,10 @@ import { cn } from "@my-website/ui/lib/utils";
 import { AnimatePresence, motion } from "motion/react";
 import { useState } from "react";
 
+import { PixelatedTextSwap } from "@/components/pixelated/text-swap";
 import { toolCategories } from "@/features/lib-tools/data";
 import type { Tool } from "@/features/lib-tools/data";
-import { PixelLabel } from "@/features/lib-tools/pixel-label";
-import { PixelLogo } from "@/features/lib-tools/pixel-logo";
+import { PixelatedLogo } from "@/features/lib-tools/pixelated-logo";
 
 interface HoveredTool {
   category: string;
@@ -41,7 +41,7 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
             ))}
             <div className="col-start-1 row-start-1">
               <AnimatePresence mode="wait">
-                <PixelLabel
+                <PixelatedTextSwap
                   key={hovered?.tool.name ?? "default"}
                   text={(hovered?.tool.name ?? "these tools").replaceAll(" ", "-")}
                   color={hovered?.tool.color}
@@ -82,7 +82,7 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
                     }}
                   >
                     <span className="sr-only">{tool.name}</span>
-                    <PixelLogo tool={tool} active={hovered?.tool.name === tool.name} />
+                    <PixelatedLogo tool={tool} active={hovered?.tool.name === tool.name} />
                   </motion.li>
                 ))}
               </ul>

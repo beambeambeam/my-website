@@ -2,7 +2,7 @@ import { cn } from "@my-website/ui/lib/utils";
 import { usePresence, useReducedMotion } from "motion/react";
 import { useEffect, useRef } from "react";
 
-import { sweep } from "@/lib/pixel-sweep";
+import { getTextSource, sweep } from "@/lib/pixel-sweep";
 
 /** Duration of the pixel sweep in, in seconds. */
 const IN_DURATION = 0.3;
@@ -13,7 +13,7 @@ const OUT_DURATION = 0.2;
 /** Width of each pixel step zone, as a multiple of the font size. */
 const STEP_SIZE = 0.35;
 
-interface PixelLabelProps {
+interface PixelatedTextSwapProps {
   text: string;
   color?: string;
   className?: string;
@@ -23,7 +23,7 @@ interface PixelLabelProps {
  * Builds the text up from bottom to top in colored pixel blocks. Inside `AnimatePresence`, it also
  * breaks the text into pixels from bottom to top on exit.
  */
-export const PixelLabel = ({ text, color, className }: PixelLabelProps) => {
+export const PixelatedTextSwap = ({ text, color, className }: PixelatedTextSwapProps) => {
   const [isPresent, safeToRemove] = usePresence();
   const safeToRemoveRef = useRef(safeToRemove);
   const textRef = useRef<HTMLSpanElement>(null);
@@ -48,20 +48,14 @@ export const PixelLabel = ({ text, color, className }: PixelLabelProps) => {
 
     const stop =
       !reduceMotion && textElement !== null && canvas !== null
-        ? sweep(
-            textElement,
-            canvas,
-            isPresent
-              ? { text, direction: "up", duration: IN_DURATION, stepSize: STEP_SIZE }
-              : {
-                  text,
-                  direction: "down",
-                  reverse: true,
-                  duration: OUT_DURATION,
-                  stepSize: STEP_SIZE,
-                  onComplete: remove,
-                },
-          )
+        ? sweep(textElement, canvas, {
+            getSource: async () => await getTextSource(textElement, text),
+            direction: isPresent ? "up" : "down",
+            reverse: !isPresent,
+            duration: isPresent ? IN_DURATION : OUT_DURATION,
+            stepSize: STEP_SIZE,
+            onComplete: isPresent ? undefined : remove,
+          })
         : null;
 
     return () => {

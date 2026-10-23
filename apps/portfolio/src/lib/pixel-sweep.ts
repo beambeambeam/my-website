@@ -88,12 +88,7 @@ const loadImage = async (src: string) => {
   }
 };
 
-/** Returns a source that paints the image at `src`, contained and centered. */
-export const getImageSource = async (src: string | null): Promise<SweepSource> => {
-  if (src === null) {
-    return {};
-  }
-
+const getImage = async (src: string) => {
   let image = imageCache.get(src);
 
   if (image === undefined) {
@@ -101,24 +96,177 @@ export const getImageSource = async (src: string | null): Promise<SweepSource> =
     imageCache.set(src, image);
   }
 
-  const loaded = await image;
+  return await image;
+};
 
-  if (loaded === null) {
+/** Draws `image` contained and centered in the box. */
+const drawContained = (
+  ctx: CanvasRenderingContext2D,
+  image: HTMLImageElement,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+) => {
+  const scale = Math.min(width / image.naturalWidth, height / image.naturalHeight);
+  const drawWidth = image.naturalWidth * scale;
+  const drawHeight = image.naturalHeight * scale;
+  ctx.drawImage(
+    image,
+    x + (width - drawWidth) / 2,
+    y + (height - drawHeight) / 2,
+    drawWidth,
+    drawHeight,
+  );
+};
+
+/** Returns a source that paints the image at `src`, contained and centered. */
+export const getImageSource = async (src: string | null): Promise<SweepSource> => {
+  const image = src === null ? null : await getImage(src);
+
+  if (image === null) {
     return {};
   }
 
   return {
     paint: (ctx, width, height) => {
-      const scale = Math.min(width / loaded.naturalWidth, height / loaded.naturalHeight);
-      const drawWidth = loaded.naturalWidth * scale;
-      const drawHeight = loaded.naturalHeight * scale;
-      ctx.drawImage(
-        loaded,
-        (width - drawWidth) / 2,
-        (height - drawHeight) / 2,
-        drawWidth,
-        drawHeight,
-      );
+      drawContained(ctx, image, 0, 0, width, height);
+    },
+  };
+};
+
+type Painter = (ctx: CanvasRenderingContext2D) => void;
+
+const toPx = (value: string) => Number(value.replace("px", ""));
+
+const getFont = (style: CSSStyleDeclaration) =>
+  `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`;
+
+const isShown = (node: Element) =>
+  node.closest("[data-pixel-ignore]") === null &&
+  node.checkVisibility({ visibilityProperty: true });
+
+/** Returns the source of the image an element shows, or null. */
+const getImageSrc = (node: Element, width: number, height: number) => {
+  if (node instanceof HTMLImageElement) {
+    return node.currentSrc;
+  }
+
+  if (node instanceof SVGSVGElement) {
+    const clone = node.cloneNode(true);
+
+    if (!(clone instanceof SVGSVGElement)) {
+      return null;
+    }
+
+    clone.setAttribute("width", `${width}`);
+    clone.setAttribute("height", `${height}`);
+
+    return `data:image/svg+xml,${encodeURIComponent(new XMLSerializer().serializeToString(clone))}`;
+  }
+
+  return (
+    /url\(["']?(?<src>.+?)["']?\)/u.exec(getComputedStyle(node).maskImage)?.groups?.src ?? null
+  );
+};
+
+/**
+ * Returns a source that traces what `element` shows: text glyphs, images, inline SVGs, masked
+ * images, and borders. Skips subtrees marked with `data-pixel-ignore`.
+ */
+export const getElementSource = async (
+  element: HTMLElement,
+  unit: number,
+): Promise<SweepSource> => {
+  await document.fonts.ready;
+
+  const origin = element.getBoundingClientRect();
+  const painters: Painter[] = [];
+  const range = document.createRange();
+  const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+
+  for (let node = walker.nextNode(); node !== null; node = walker.nextNode()) {
+    const parent = node.parentElement;
+    const text = node.textContent ?? "";
+
+    const parentRect = parent?.getBoundingClientRect();
+
+    // Screen-reader-only text sits in a 1px box, so skip text in boxes that small.
+    if (parent !== null && isShown(parent) && parentRect !== undefined && parentRect.width > 1) {
+      const style = getComputedStyle(parent);
+      const font = getFont(style);
+
+      for (let index = 0; index < text.length; index += 1) {
+        const char = transformText(text[index], style.textTransform);
+        range.setStart(node, index);
+        range.setEnd(node, index + 1);
+        const rect = range.getBoundingClientRect();
+
+        if (char.trim() !== "" && rect.width > 1 && rect.height > 1) {
+          const x = rect.left - origin.left;
+          const y = rect.top - origin.top;
+
+          painters.push((ctx) => {
+            ctx.font = font;
+            const metrics = ctx.measureText(char);
+            const ascent = metrics.fontBoundingBoxAscent;
+            const descent = metrics.fontBoundingBoxDescent;
+            ctx.fillText(char, x, y + (rect.height - ascent - descent) / 2 + ascent);
+          });
+        }
+      }
+    }
+  }
+
+  const images = element.querySelectorAll("img, svg, [style*='mask-image']");
+
+  await Promise.all(
+    [...images].map(async (node) => {
+      const rect = node.getBoundingClientRect();
+      const src = isShown(node) ? getImageSrc(node, rect.width, rect.height) : null;
+      const image = src === null ? null : await getImage(src);
+
+      if (image !== null) {
+        painters.push((ctx) => {
+          drawContained(
+            ctx,
+            image,
+            rect.left - origin.left,
+            rect.top - origin.top,
+            rect.width,
+            rect.height,
+          );
+        });
+      }
+    }),
+  );
+
+  for (const node of [element, ...element.querySelectorAll("*")]) {
+    const style = getComputedStyle(node);
+    const rect = node.getBoundingClientRect();
+    const x = rect.left - origin.left;
+    const y = rect.top - origin.top;
+    const top = style.borderTopStyle === "none" ? 0 : toPx(style.borderTopWidth);
+    const right = style.borderRightStyle === "none" ? 0 : toPx(style.borderRightWidth);
+    const bottom = style.borderBottomStyle === "none" ? 0 : toPx(style.borderBottomWidth);
+    const left = style.borderLeftStyle === "none" ? 0 : toPx(style.borderLeftWidth);
+
+    if (top + right + bottom + left > 0 && isShown(node)) {
+      painters.push((ctx) => {
+        ctx.fillRect(x, y, rect.width, top);
+        ctx.fillRect(x + rect.width - right, y, right, rect.height);
+        ctx.fillRect(x, y + rect.height - bottom, rect.width, bottom);
+        ctx.fillRect(x, y, left, rect.height);
+      });
+    }
+  }
+
+  return {
+    unit,
+    paint: (ctx) => {
+      for (const painter of painters) {
+        painter(ctx);
+      }
     },
   };
 };
@@ -293,8 +441,9 @@ export const createPixelSweep = (
 };
 
 export interface SweepOptions extends PixelSweepOptions {
-  text: string;
-  /** Plays the sweep backward: the sharp text breaks into pixels and goes away. */
+  /** Returns the shape that the pixel blocks follow. */
+  getSource: () => Promise<SweepSource>;
+  /** Plays the sweep backward: the sharp element breaks into pixels and goes away. */
   reverse?: boolean;
   /** Duration in seconds. */
   duration: number;
@@ -303,26 +452,26 @@ export interface SweepOptions extends PixelSweepOptions {
   onComplete?: () => void;
 }
 
-/** Plays a pixel sweep over the text element once. Returns a function that stops it. */
+/** Plays a pixel sweep over the element once. Returns a function that stops it. */
 export const sweep = (
-  textElement: HTMLElement,
+  element: HTMLElement,
   canvas: HTMLCanvasElement,
-  { text, reverse = false, duration, delay = 0, onComplete, ...options }: SweepOptions,
+  { getSource, reverse = false, duration, delay = 0, onComplete, ...options }: SweepOptions,
 ) => {
   let cancelled = false;
   let pixelSweep: PixelSweep | null = null;
   let controls: AnimationPlaybackControls | undefined;
 
-  textElement.style.clipPath = reverse ? "none" : getClipPath(options.direction, "100%");
+  element.style.clipPath = reverse ? "none" : getClipPath(options.direction, "100%");
 
   const run = async () => {
-    const source = await getTextSource(textElement, text);
+    const source = await getSource();
 
     if (cancelled) {
       return;
     }
 
-    pixelSweep = createPixelSweep(textElement, canvas, source, options);
+    pixelSweep = createPixelSweep(element, canvas, source, options);
 
     if (pixelSweep === null) {
       onComplete?.();

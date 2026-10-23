@@ -59,7 +59,7 @@ const ToolLogo = ({ tool, color }: ToolLogoProps) => {
   );
 };
 
-interface PixelLogoProps {
+interface PixelatedLogoProps {
   tool: Tool;
   /** Shows the logo in its brand color. */
   active: boolean;
@@ -71,7 +71,7 @@ interface PixelLogoProps {
  * Shows the logo in the foreground color. When active, colored pixel blocks sweep up the logo and
  * sharpen into the brand color. When inactive again, the sweep goes back from where it is.
  */
-export const PixelLogo = ({ tool, active, duration = 0.35 }: PixelLogoProps) => {
+export const PixelatedLogo = ({ tool, active, duration = 0.35 }: PixelatedLogoProps) => {
   const colorRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const progress = useMotionValue(0);
@@ -130,7 +130,11 @@ export const PixelLogo = ({ tool, active, duration = 0.35 }: PixelLogoProps) => 
   return (
     <div className="relative size-full">
       <ToolLogo tool={tool} color="var(--foreground)" />
-      <div ref={colorRef} className="absolute inset-0 [clip-path:inset(100%_0_0_0)]">
+      <div
+        ref={colorRef}
+        data-pixel-ignore
+        className="absolute inset-0 [clip-path:inset(100%_0_0_0)]"
+      >
         <ToolLogo tool={tool} color={tool.color} />
       </div>
       <canvas
