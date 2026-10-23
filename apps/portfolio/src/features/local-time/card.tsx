@@ -14,7 +14,11 @@ const TIME_ZONE = "Asia/Bangkok";
 
 const ZONE_LABEL = "GMT+7";
 
+/** Map of central Bangkok from OpenStreetMap. See `public/statics/maps/README.md`. */
+const MAP_SRC = "/statics/maps/bangkok.svg";
+
 type SkyStyle = CSSProperties & {
+  "--sky-base": string;
   "--sky-ink": string;
   "--sky-muted": string;
   "--sky-accent": string;
@@ -35,6 +39,7 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
   const sky = skyAt(Number(time.slice(0, 2)));
 
   const style: SkyStyle = {
+    "--sky-base": sky.base,
     "--sky-ink": sky.ink,
     "--sky-muted": sky.muted,
     "--sky-accent": sky.accent,
@@ -44,7 +49,10 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
   return (
     <div
       style={style}
-      className={cn("relative isolate w-72 text-(--sky-ink)", className)}
+      className={cn(
+        "relative isolate grid w-144 max-w-full grid-cols-2 text-(--sky-ink)",
+        className,
+      )}
       onPointerEnter={() => {
         setHovered(true);
       }}
@@ -56,25 +64,46 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
       <h2 className="sr-only">
         Local time, {ZONE_LABEL}, {sky.name.toLowerCase()} sky
       </h2>
-      <LensClock
-        timeZone={TIME_ZONE}
-        theme="light"
-        className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
-      />
-      <p
-        aria-hidden="true"
-        className="absolute top-0 left-0 p-4 text-xs text-(--sky-muted) uppercase"
-      >
-        My local time
-      </p>
-      <div aria-hidden="true" className="absolute bottom-0 left-0 p-4">
-        <div className="h-7 font-mono text-lg font-bold">
-          <AnimatePresence mode="wait">
-            <PixelatedTextSwap
-              key={hovered ? time : ZONE_LABEL}
-              text={hovered ? time : ZONE_LABEL}
-            />
-          </AnimatePresence>
+      <div className="relative aspect-square">
+        {/* Lines are decoration, so they stay faint and leave the label as the focus. */}
+        <div
+          aria-hidden="true"
+          style={{ maskImage: `url(${MAP_SRC})` }}
+          className="absolute inset-0 bg-(--sky-ink) [mask-size:100%_100%] opacity-50"
+        />
+        <p className="absolute inset-0 grid place-items-center text-lg font-semibold [text-shadow:0_0_6px_var(--sky-base),0_0_2px_var(--sky-base)]">
+          Bangkok
+        </p>
+        <a
+          href="https://www.openstreetmap.org/copyright"
+          target="_blank"
+          rel="noreferrer"
+          className="absolute bottom-0 left-0 p-2 text-[0.625rem] text-(--sky-muted) hover:underline"
+        >
+          © OpenStreetMap
+        </a>
+      </div>
+      <div className="relative">
+        <LensClock
+          timeZone={TIME_ZONE}
+          theme="light"
+          className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
+        />
+        <p
+          aria-hidden="true"
+          className="absolute top-0 left-0 p-4 text-xs text-(--sky-muted) uppercase"
+        >
+          My local time
+        </p>
+        <div aria-hidden="true" className="absolute bottom-0 left-0 p-4">
+          <div className="h-7 font-mono text-lg font-bold">
+            <AnimatePresence mode="wait">
+              <PixelatedTextSwap
+                key={hovered ? time : ZONE_LABEL}
+                text={hovered ? time : ZONE_LABEL}
+              />
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </div>
