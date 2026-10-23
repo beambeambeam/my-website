@@ -8,6 +8,7 @@ import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
+import { ExperienceCard } from "@/features/experience/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
 import { LocalTimeCard } from "@/features/local-time/card";
 import { useInView } from "@/hooks/use-in-view";
@@ -53,7 +54,10 @@ const HomeComponent = () => {
             </section>
             <section className="border-b">
               <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
-                <LibsToolsCard className="border-y border-r lg:border-l" />
+                <div className="flex flex-col border-y border-r md:flex-row lg:border-l">
+                  <ExperienceCard className="md:w-md" />
+                  <LibsToolsCard className="border-t md:border-t-0 md:border-l" />
+                </div>
               </PixelatedBlockReveal>
             </section>
             {/* Temporary scroll space to preview the profile card. */}
