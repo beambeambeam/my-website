@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef } from "react";
 
+import { Footer } from "@/components/footer";
 import { GradualBlur } from "@/components/gradual-blur";
 import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
 import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
@@ -65,6 +66,7 @@ const HomeComponent = () => {
           </div>
         </div>
       </div>
+      <Footer name="Beam" />
       {!headerInView && (
         <>
           <GradualBlur
