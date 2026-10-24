@@ -1,6 +1,3 @@
-/** Placeholder until each company has its own photo. */
-const PLACEHOLDER_IMAGE = "/statics/placeholder/banner.svg";
-
 /** Work experience, from the resume in `my-cv-resume/src/experience`. */
 export interface Experience {
   company: string;
@@ -17,21 +14,21 @@ export const experiences: Experience[] = [
     period: "Jun 2026 – Now",
     role: "Software Engineer Intern",
     type: "Internship, Thailand",
-    image: PLACEHOLDER_IMAGE,
+    image: "/statics/experience/agoda.webp",
   },
   {
     company: "KMUTT Computer Engineering",
     period: "Jan 2026 – Now",
     role: "Fullstack Web Developer",
     type: "Part-time, Remote",
-    image: PLACEHOLDER_IMAGE,
+    image: "/statics/experience/kmutt-cpe.webp",
   },
   {
     company: "Wirabyte",
     period: "Jul 2024 – Jun 2026",
     role: "Frontend Developer",
     type: "Part-time",
-    image: PLACEHOLDER_IMAGE,
+    image: "/statics/experience/wirabyte.webp",
   },
 ];
 
@@ -51,6 +48,6 @@ export const educations: Education[] = [
     period: "Exp. May 2028",
     degree: "Bachelor of Computer Engineering",
     note: "Petchra Pra Jom Klao Scholarship",
-    image: PLACEHOLDER_IMAGE,
+    image: "/statics/experience/kmutt.webp",
   },
 ];
