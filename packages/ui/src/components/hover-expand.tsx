@@ -26,6 +26,11 @@ export interface HoverExpandProps {
    * @default 320
    */
   expandedHeight?: number;
+  /**
+   * Renders the image of a row in place of the default fade. It fills a box of `expandedHeight` at
+   * the row bottom, so its size stays the same while the row expands.
+   */
+  renderImage?: (item: HoverExpandItem, active: boolean) => React.ReactNode;
   className?: string;
 }
 
@@ -34,6 +39,7 @@ export function HoverExpand({
   items,
   collapsedHeight = 68,
   expandedHeight = 320,
+  renderImage,
   className,
 }: HoverExpandProps) {
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
@@ -72,24 +78,35 @@ export function HoverExpand({
               setActiveIndex(null);
             }}
           >
+            {renderImage === undefined ? (
+              <motion.div
+                className="absolute inset-0 size-full"
+                initial={false}
+                animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 1.06 }}
+                transition={{
+                  opacity: { duration: 0.45, ease: [0.23, 1, 0.32, 1] },
+                  scale: { duration: 0.55, ease: [0.23, 1, 0.32, 1] },
+                }}
+              >
+                <img
+                  src={item.image}
+                  alt={item.imageAlt ?? ""}
+                  className="size-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </motion.div>
+            ) : (
+              <div className="absolute inset-x-0 bottom-0" style={{ height: expandedHeight }}>
+                {renderImage(item, isActive)}
+              </div>
+            )}
             <motion.div
-              className="absolute inset-0 size-full"
+              className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-black/10"
               initial={false}
-              animate={{ opacity: isActive ? 1 : 0, scale: isActive ? 1 : 1.06 }}
-              transition={{
-                opacity: { duration: 0.45, ease: [0.23, 1, 0.32, 1] },
-                scale: { duration: 0.55, ease: [0.23, 1, 0.32, 1] },
-              }}
-            >
-              <img
-                src={item.image}
-                alt={item.imageAlt ?? ""}
-                className="size-full object-cover"
-                loading="lazy"
-                decoding="async"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/20 to-black/10" />
-            </motion.div>
+              animate={{ opacity: isActive ? 1 : 0 }}
+              transition={{ duration: 0.45, ease: [0.23, 1, 0.32, 1] }}
+            />
 
             <div className="absolute inset-0 flex items-end px-4 pb-4">
               <div className="relative flex w-full items-end justify-between gap-4">
