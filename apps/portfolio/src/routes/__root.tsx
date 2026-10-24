@@ -1,10 +1,18 @@
 import { Toaster } from "@my-website/ui/components/sonner";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { lazy, Suspense } from "react";
 
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "@/index.css";
+
+const TanStackRouterDevtools = import.meta.env.DEV
+  ? lazy(async () => {
+      const { TanStackRouterDevtools: Devtools } = await import("@tanstack/react-router-devtools");
+
+      return { default: Devtools };
+    })
+  : () => null;
 
 const RootComponent = () => (
   <>
@@ -17,7 +25,9 @@ const RootComponent = () => (
       <Outlet />
       <Toaster richColors />
     </ThemeProvider>
-    <TanStackRouterDevtools position="bottom-left" />
+    <Suspense>
+      <TanStackRouterDevtools position="bottom-left" />
+    </Suspense>
   </>
 );
 
