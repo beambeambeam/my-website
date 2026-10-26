@@ -55,3 +55,7 @@ coverage
 .cache
 tmp
 temp
+
+# Agent skills (restore with `bun run skills:install`)
+.agents/skills
+.claude/skills

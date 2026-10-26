@@ -11,6 +11,9 @@ const generatedFiles = [
   "apps/portfolio/src/routeTree.gen.ts",
 ];
 
+// The skills CLI installs these files, so they keep the upstream format.
+const vendoredSkills = [".agents/skills/**", ".claude/skills/**"];
+
 export default defineConfig({
   staged: {
     "*": "vp check --fix",
@@ -19,7 +22,11 @@ export default defineConfig({
     ...ultraciteOxfmt,
     printWidth: 100,
     trailingComma: "all",
-    ignorePatterns: [...(ultraciteOxfmt.ignorePatterns ?? []), ...generatedFiles],
+    ignorePatterns: [
+      ...(ultraciteOxfmt.ignorePatterns ?? []),
+      ...generatedFiles,
+      ...vendoredSkills,
+    ],
     sortImports: {},
     sortTailwindcss: {
       functions: ["clsx", "cva", "tw", "twMerge", "cn", "twJoin", "tv"],

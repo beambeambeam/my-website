@@ -24,3 +24,13 @@
 
 - A push to `main` deploys the site through GitHub Actions. CI builds once and uploads the `dist` artifact. The deploy job publishes that artifact with Wrangler to the Worker `portfolio`.
 - Do not run `bun run deploy` unless the owner asks. It publishes to `thisisbeam.fyi`.
+
+# Agent skills
+
+## Issue tracker
+
+Issues live in GitHub Issues on `beambeambeam/my-website`, managed with `gh`. See `docs/agents/issue-tracker.md`.
+
+## Domain docs
+
+Multi-context: a root `GLOSSARY-MAP.md` points to one `GLOSSARY.md` per workspace package. See `docs/agents/domain.md`.
