@@ -32,6 +32,7 @@
     "prepare": "vp config",
     "dev:portfolio": "vp run --filter portfolio dev",
     "env:generate": "varlock codegen --path ./apps/portfolio/",
+    "skills:install": "bunx skills experimental_install -y && rm -rf .claude/skills && mkdir -p .claude && ln -s ../.agents/skills .claude/skills",
     "postinstall": "varlock codegen --path ./apps/portfolio/"
   },
   "dependencies": {
