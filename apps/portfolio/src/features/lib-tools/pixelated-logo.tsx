@@ -61,17 +61,19 @@ const ToolLogo = ({ tool, color }: ToolLogoProps) => {
 
 interface PixelatedLogoProps {
   tool: Tool;
-  /** Shows the logo in its brand color. */
+  /** Shows the full-color logo. */
   active: boolean;
   /** Time of a full sweep, in seconds. */
   duration?: number;
 }
 
 /**
- * Shows the logo in the foreground color. When active, colored pixel blocks sweep up the logo and
- * sharpen into the brand color. When inactive again, the sweep goes back from where it is.
+ * Shows the mono logo in the foreground color. When active, colored pixel blocks sweep up the logo
+ * and sharpen into the full-color logo, or into the brand color when the tool has none. When
+ * inactive again, the sweep goes back from where it is.
  */
 export const PixelatedLogo = ({ tool, active, duration = 0.35 }: PixelatedLogoProps) => {
+  const monoRef = useRef<HTMLDivElement>(null);
   const colorRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const progress = useMotionValue(0);
@@ -83,16 +85,18 @@ export const PixelatedLogo = ({ tool, active, duration = 0.35 }: PixelatedLogoPr
 
     const build = async () => {
       const source = await getImageSource(getLogoSrc(tool));
+      const monoElement = monoRef.current;
       const colorElement = colorRef.current;
       const canvas = canvasRef.current;
 
-      if (ignore || colorElement === null || canvas === null) {
+      if (ignore || monoElement === null || colorElement === null || canvas === null) {
         return;
       }
 
       pixelSweep = createPixelSweep(colorElement, canvas, source, {
         direction: "up",
         stepSize: STEP_SIZE,
+        replaced: monoElement,
       });
       pixelSweep?.render(progress.get());
     };
@@ -129,13 +133,19 @@ export const PixelatedLogo = ({ tool, active, duration = 0.35 }: PixelatedLogoPr
 
   return (
     <div className="relative size-full">
-      <ToolLogo tool={tool} color="var(--foreground)" />
+      <div ref={monoRef} className="size-full">
+        <ToolLogo tool={tool} color="var(--foreground)" />
+      </div>
       <div
         ref={colorRef}
         data-pixel-ignore
         className="absolute inset-0 [clip-path:inset(100%_0_0_0)]"
       >
-        <ToolLogo tool={tool} color={tool.color} />
+        {tool.colorSrc === undefined ? (
+          <ToolLogo tool={tool} color={tool.color} />
+        ) : (
+          <img src={tool.colorSrc} alt="" className="size-full object-contain" />
+        )}
       </div>
       <canvas
         ref={canvasRef}
