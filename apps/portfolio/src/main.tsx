@@ -1,14 +1,18 @@
+import { PixelLoader } from "@my-website/ui/components/pixel-loader";
 import { RouterProvider, createRouter } from "@tanstack/react-router";
 import ReactDOM from "react-dom/client";
 
-import Loader from "./components/loader";
 import { routeTree } from "./routeTree.gen";
 
 const router = createRouter({
   routeTree,
   defaultPreload: "intent",
   scrollRestoration: true,
-  defaultPendingComponent: () => <Loader />,
+  defaultPendingComponent: () => (
+    <div className="flex h-full items-center justify-center pt-8">
+      <PixelLoader variant="dia" />
+    </div>
+  ),
 });
 
 declare module "@tanstack/react-router" {

@@ -1,9 +1,10 @@
+import { DIA_COLORS } from "@my-website/ui/lib/dia-colors";
 import { cn } from "@my-website/ui/lib/utils";
 import { useInView, useReducedMotion } from "motion/react";
 import type { UseInViewOptions } from "motion/react";
 import { useEffect, useRef } from "react";
 
-import { DIA_COLORS, getTextSource, sweep } from "@/lib/pixel-sweep";
+import { getTextSource, sweep } from "@/lib/pixel-sweep";
 
 interface PixelatedTextRevealProps {
   text: string;
