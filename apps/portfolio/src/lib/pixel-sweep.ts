@@ -334,6 +334,17 @@ const getClipPath = (direction: SweepDirection, hidden: string) => {
   return direction === "down" ? `inset(0 0 ${hidden} 0)` : `inset(${hidden} 0 0 0)`;
 };
 
+/** Returns the clip path that shows only the part that `getClipPath` hides. */
+const getReplacedClipPath = (direction: SweepDirection, hidden: string) => {
+  const shown = `calc(100% - ${hidden})`;
+
+  if (direction === "right") {
+    return `inset(0 0 0 ${shown})`;
+  }
+
+  return direction === "down" ? `inset(${shown} 0 0 0)` : `inset(0 0 ${shown} 0)`;
+};
+
 const createGradient = (
   ctx: CanvasRenderingContext2D,
   direction: SweepDirection,
@@ -388,6 +399,8 @@ export interface PixelSweepOptions {
   colors?: string[];
   /** Width of each pixel step zone, as a multiple of the source unit. */
   stepSize?: number;
+  /** Element in the same box that `element` replaces. It shows only where `element` is hidden. */
+  replaced?: HTMLElement;
 }
 
 export interface PixelSweep {
@@ -404,7 +417,7 @@ export const createPixelSweep = (
   element: HTMLElement,
   canvas: HTMLCanvasElement,
   source: SweepSource,
-  { direction, colors = DIA_COLORS, stepSize = 1.2 }: PixelSweepOptions,
+  { direction, colors = DIA_COLORS, stepSize = 1.2, replaced }: PixelSweepOptions,
 ): PixelSweep | null => {
   const ctx = canvas.getContext("2d");
 
@@ -424,17 +437,25 @@ export const createPixelSweep = (
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   };
 
+  const setHidden = (hidden: string) => {
+    element.style.clipPath = getClipPath(direction, hidden);
+
+    if (replaced !== undefined) {
+      replaced.style.clipPath = getReplacedClipPath(direction, hidden);
+    }
+  };
+
   const render = (progress: number) => {
     if (progress <= 0 || progress >= 1) {
       clear();
-      element.style.clipPath = progress <= 0 ? getClipPath(direction, "100%") : "none";
+      setHidden(progress <= 0 ? "100%" : "0%");
 
       return;
     }
 
     const sharp = draw(ctx, direction, layout, progress * end, colors);
     const hidden = Math.min(layout.length, Math.max(0, layout.length - sharp));
-    element.style.clipPath = getClipPath(direction, `${hidden}px`);
+    setHidden(`${hidden}px`);
   };
 
   return { render, clear };
