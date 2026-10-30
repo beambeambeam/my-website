@@ -1,7 +1,6 @@
+import { DIA_COLORS } from "@my-website/ui/lib/dia-colors";
 import { animate } from "motion/react";
 import type { AnimationPlaybackControls } from "motion/react";
-
-export const DIA_COLORS = ["#f0abfc", "#f472b6", "#fb923c", "#facc15", "#a3e635"];
 
 /** Pixel block sizes of the steps, from coarse to fine, as a fraction of the source unit. */
 const STEPS = [0.3, 0.15, 0.075];
