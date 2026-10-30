@@ -1,3 +1,4 @@
+import { DIA_COLORS } from "@my-website/ui/lib/dia-colors";
 import { getPixelPhases } from "@my-website/ui/lib/pixel-loader";
 import type { PixelGrid, PixelPattern, PixelSweepDirection } from "@my-website/ui/lib/pixel-loader";
 import { cn } from "@my-website/ui/lib/utils";
@@ -8,6 +9,11 @@ export type { PixelGrid, PixelPattern, PixelSweepDirection } from "@my-website/u
 // Cell size in viewBox units.
 const CELL_SIZE = 3;
 
+/** Dia colors as the CSS variables that the `pixel-loader-dia` keyframes read. */
+const DIA_VARIABLES = Object.fromEntries(
+  DIA_COLORS.map((color, index) => [`--dia-${index}`, color]),
+);
+
 export interface PixelLoaderProps extends Omit<React.ComponentProps<"output">, "children"> {
   /** Cells on each side of the grid. */
   grid?: PixelGrid;
@@ -17,6 +23,8 @@ export interface PixelLoaderProps extends Omit<React.ComponentProps<"output">, "
   direction?: PixelSweepDirection;
   /** Length of one full cycle in milliseconds. */
   duration?: number;
+  /** `mono` lights cells in the text color. `dia` lights them in the Dia colors. */
+  variant?: "mono" | "dia";
   /** Text that screen readers announce. */
   label?: string;
 }
@@ -30,6 +38,7 @@ function PixelLoader({
   pattern = "ripple",
   direction,
   duration = 1200,
+  variant = "mono",
   label = "Loading",
   className,
   ...props
@@ -48,6 +57,7 @@ function PixelLoader({
         aria-hidden
         className="size-full [shape-rendering:crispEdges]"
         fill="currentColor"
+        style={variant === "dia" ? DIA_VARIABLES : undefined}
         viewBox={`0 0 ${viewBoxSize} ${viewBoxSize}`}
       >
         {phases.map((phase, index) => (
@@ -58,7 +68,10 @@ function PixelLoader({
             y={Math.floor(index / grid) * CELL_SIZE}
             width={CELL_SIZE}
             height={CELL_SIZE}
-            className="animate-pixel-loader opacity-20 motion-reduce:paused"
+            className={cn(
+              "opacity-20 motion-reduce:paused",
+              variant === "dia" ? "animate-pixel-loader-dia" : "animate-pixel-loader",
+            )}
             style={{
               animationDuration: `${duration}ms`,
               // A negative delay starts each cell mid-cycle, so the pattern shows on the first frame.

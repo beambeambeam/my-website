@@ -190,6 +190,34 @@
       opacity: 0.2;
     }
   }
+
+  /* Each cell lights up in the first Dia color and fades back through the rest. */
+  --animate-pixel-loader-dia: pixel-loader-dia 1200ms ease-out infinite;
+
+  @keyframes pixel-loader-dia {
+    0% {
+      fill: var(--dia-0);
+      opacity: 1;
+    }
+    8% {
+      fill: var(--dia-1);
+    }
+    16% {
+      fill: var(--dia-2);
+    }
+    24% {
+      fill: var(--dia-3);
+      opacity: 1;
+    }
+    32% {
+      fill: var(--dia-4);
+    }
+    40%,
+    100% {
+      fill: currentColor;
+      opacity: 0.2;
+    }
+  }
 }
 
 @layer base {

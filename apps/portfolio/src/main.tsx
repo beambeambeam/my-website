@@ -10,7 +10,7 @@ const router = createRouter({
   scrollRestoration: true,
   defaultPendingComponent: () => (
     <div className="flex h-full items-center justify-center pt-8">
-      <PixelLoader />
+      <PixelLoader variant="dia" />
     </div>
   ),
 });
