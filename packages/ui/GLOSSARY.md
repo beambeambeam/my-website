@@ -13,3 +13,9 @@ _Avoid_: Spinner, pixel wave icon
 **Pixel Pattern**:\
 The order in which the cells of a Pixel Loader light up, such as ripple, radar, or rain.\
 _Avoid_: Preset, wave
+
+### Pixel effects
+
+**Dia Colors**:\
+The five colors of the pixel effects, from pink through orange and yellow to lime.\
+_Avoid_: Rainbow, gradient
