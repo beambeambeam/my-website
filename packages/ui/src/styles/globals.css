@@ -178,6 +178,18 @@
   --tracking-wider: calc(var(--tracking-normal) + 0.05em);
   --tracking-widest: calc(var(--tracking-normal) + 0.1em);
   --container-10xl: 104rem;
+
+  --animate-pixel-loader: pixel-loader 1200ms ease-out infinite;
+
+  @keyframes pixel-loader {
+    0% {
+      opacity: 1;
+    }
+    40%,
+    100% {
+      opacity: 0.2;
+    }
+  }
 }
 
 @layer base {
