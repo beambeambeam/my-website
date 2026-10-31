@@ -12,8 +12,7 @@ import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
 import { ExperienceCard } from "@/features/experience/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
-import { LocalTimeClockCard } from "@/features/local-time/clock-card";
-import { LocalTimeMapCard } from "@/features/local-time/map-card";
+import { LocalTimeCard } from "@/features/local-time/card";
 import { useInView } from "@/hooks/use-in-view";
 
 const profile = {
@@ -49,24 +48,20 @@ const HomeComponent = () => {
           </header>
           <div className="mt-8 min-w-0 lg:mt-0">
             <Grid className="lg:mt-8">
-              <Block>
+              <Block cols={2}>
                 <PixelatedBlockReveal>
-                  <LocalTimeMapCard />
-                </PixelatedBlockReveal>
-              </Block>
-              <Block>
-                <PixelatedBlockReveal>
-                  <LocalTimeClockCard />
+                  <LocalTimeCard />
                 </PixelatedBlockReveal>
               </Block>
               {/* Empty space beside the content. Hidden below md. */}
-              <Block cols={2} rows={3} className="max-md:hidden" />
-              <Block cols={2}>
+              <Block cols={2} className="max-md:hidden" />
+              <Block cols={4} rows={3} className="max-md:hidden" />
+              <Block cols={4}>
                 <PixelatedBlockReveal>
                   <ExperienceCard />
                 </PixelatedBlockReveal>
               </Block>
-              <Block cols={2}>
+              <Block cols={4}>
                 <PixelatedBlockReveal>
                   <LibsToolsCard />
                 </PixelatedBlockReveal>
