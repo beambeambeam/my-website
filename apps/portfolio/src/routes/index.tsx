@@ -52,7 +52,7 @@ const HomeComponent = () => {
             </section>
             <section className="border-b">
               <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
-                <ExperienceCard className="border-y border-r md:w-md lg:border-l" />
+                <ExperienceCard className="w-fit border-y border-r lg:border-l" />
               </PixelatedBlockReveal>
             </section>
             <section className="border-b">

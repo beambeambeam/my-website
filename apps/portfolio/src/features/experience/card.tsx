@@ -1,53 +1,54 @@
-import { HoverExpand } from "@my-website/ui/components/hover-expand";
-import type { HoverExpandItem } from "@my-website/ui/components/hover-expand";
-
-import { PixelatedImage } from "@/components/pixelated/image";
 import { educations, experiences } from "@/features/experience/data";
 
 interface ExperienceCardProps {
   className?: string;
 }
 
-const experienceItems = experiences.map((experience) => ({
-  label: experience.company,
-  sublabel: experience.period,
-  image: experience.image,
-  description: `${experience.role} · ${experience.type}`,
+interface ExperienceItem {
+  title: string;
+  period: string;
+  description: string;
+}
+
+const experienceItems: ExperienceItem[] = experiences.map((experience) => ({
+  title: experience.company,
+  period: experience.period,
+  description: experience.role,
 }));
 
-const educationItems = educations.map((education) => ({
-  label: education.school,
-  sublabel: education.period,
-  image: education.image,
-  description: `${education.degree} · ${education.note}`,
+const educationItems: ExperienceItem[] = educations.map((education) => ({
+  title: education.school,
+  period: education.period,
+  description: education.degree,
 }));
 
-const renderImage = (item: HoverExpandItem, active: boolean) => (
-  <PixelatedImage
-    src={item.image}
-    alt={item.imageAlt ?? ""}
-    active={active}
-    className="size-full"
-  />
+interface ExperienceListProps {
+  heading: string;
+  items: ExperienceItem[];
+}
+
+const ExperienceList = ({ heading, items }: ExperienceListProps) => (
+  <>
+    <h2 className="p-4 text-xs text-muted-foreground uppercase">{heading}</h2>
+    <ul className="divide-y border-y">
+      {items.map((item) => (
+        <li key={item.title} className="p-4">
+          <div className="flex items-baseline justify-between gap-4">
+            <div className="flex items-baseline gap-2">
+              <h3 className="text-xs font-medium">{item.title}</h3>
+              <p className="text-xs text-muted-foreground">{item.description}</p>
+            </div>
+            <p className="text-xs whitespace-nowrap text-muted-foreground">{item.period}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  </>
 );
 
 export const ExperienceCard = ({ className }: ExperienceCardProps) => (
   <div className={className}>
-    <h2 className="p-4 text-xs text-muted-foreground uppercase">Where I have worked</h2>
-    <HoverExpand
-      items={experienceItems}
-      collapsedHeight={52}
-      expandedHeight={220}
-      renderImage={renderImage}
-      className="border-y"
-    />
-    <h2 className="p-4 text-xs text-muted-foreground uppercase">Education</h2>
-    <HoverExpand
-      items={educationItems}
-      collapsedHeight={52}
-      expandedHeight={220}
-      renderImage={renderImage}
-      className="border-y"
-    />
+    <ExperienceList heading="Where I have worked" items={experienceItems} />
+    <ExperienceList heading="Education" items={educationItems} />
   </div>
 );
