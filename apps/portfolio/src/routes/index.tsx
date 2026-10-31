@@ -22,34 +22,35 @@ const profile = {
   avatarSrc: "/statics/placeholder/avatar.svg",
 };
 
+const AVATAR_VARS =
+  "[--avatar:round(max(18rem,18cqw),1px)] [--col:calc((100cqw-var(--avatar)-8px)/8)] [--greeting-h:calc(var(--avatar)-var(--col)-3.5px)]";
+
 const HomeComponent = () => {
   const headerRef = useRef<HTMLElement>(null);
   const headerInView = useInView(headerRef);
 
   return (
-    <main>
-      <div className="mx-auto w-full max-w-10xl border-r">
-        <div className="@container grid gap-x-6 pl-4 sm:pl-6 lg:grid-cols-[max-content_minmax(0,1fr)]">
-          <header ref={headerRef} className="min-w-0 self-start pr-4 sm:pr-6 lg:pr-0">
+    <main className={AVATAR_VARS}>
+      <div className="mx-auto w-full max-w-10xl border-x">
+        <div className="@container grid lg:grid-cols-[max-content_minmax(0,1fr)]">
+          <header
+            ref={headerRef}
+            className="mt-8 flex min-w-0 self-start border-t max-lg:items-end lg:w-(--avatar) lg:flex-col"
+          >
             <ProfileAvatar
               src={profile.avatarSrc}
               alt={profile.name}
               fallback={profile.name.charAt(0)}
-              size="round(max(4.8rem,14cqw),1px)"
-              className="mt-6"
+              className="w-24 shrink-0 border-r sm:w-32 lg:w-full lg:border-r-0 lg:border-b"
             />
-            <div className="mt-4 space-y-1">
-              <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
-                <PixelatedTextReveal text={profile.name} />
-              </h1>
-              <p className="text-muted-foreground sm:text-lg">
-                <PixelatedTextReveal text={profile.title} />
-              </p>
-            </div>
+            <h1 className="p-3 font-serif text-2xl tracking-tight">
+              <PixelatedTextReveal text={profile.name} />
+            </h1>
           </header>
-          <div className="mt-8 min-w-0 border-l lg:mt-0">
+          <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
             <Grid className="lg:mt-8">
-              <Block cols={8} className="flex items-end p-4 sm:p-6">
+              {/* On lg, rows 1 and 2 end at the bottom line of the avatar. */}
+              <Block cols={8} className="flex items-end p-4 sm:p-6 lg:min-h-(--greeting-h)">
                 <h2 className="text-xl tracking-tight sm:text-2xl">
                   <span className="block font-serif">
                     <PixelatedTextReveal text="Hi, I'm Beam." />
@@ -98,9 +99,9 @@ const HomeComponent = () => {
             className="fixed inset-x-0 top-0 z-10 lg:hidden"
           />
           <ProfileBar {...profile} className="fixed inset-x-0 top-0 z-10 lg:hidden" />
-          <div className="pointer-events-none fixed inset-x-0 top-4 z-10 hidden lg:block">
-            <div className="mx-auto w-full max-w-10xl px-4 sm:px-6">
-              <ProfileCard {...profile} className="pointer-events-auto" />
+          <div className="pointer-events-none fixed inset-x-0 top-0 z-10 hidden lg:block">
+            <div className="@container mx-auto w-full max-w-10xl border-x border-transparent">
+              <ProfileCard {...profile} className="pointer-events-auto w-(--avatar)" />
             </div>
           </div>
         </>
