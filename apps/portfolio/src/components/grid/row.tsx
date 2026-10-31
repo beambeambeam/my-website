@@ -19,7 +19,7 @@ export const Row = ({ children, stack = false }: RowProps) => (
   <div
     className={cn(
       "flex gap-px overflow-hidden bg-border",
-      stack ? "flex-col md:flex-row" : "flex-row",
+      stack ? "flex-col max-md:*:w-full md:flex-row" : "flex-row",
     )}
   >
     {children}
