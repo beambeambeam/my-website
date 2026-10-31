@@ -1,6 +1,6 @@
 # Maps
 
-`bangkok.svg` uses map data from [OpenStreetMap](https://www.openstreetmap.org/copyright). The data uses the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/). The local time card shows the credit "© OpenStreetMap" with a link to the copyright page.
+`bangkok.svg` uses map data from [OpenStreetMap](https://www.openstreetmap.org/copyright). The data uses the [Open Database License (ODbL)](https://opendatacommons.org/licenses/odbl/). The local time map shows the credit "© OpenStreetMap" with a link to the copyright page.
 
 The SVG shows a square area centered on Democracy Monument (13.7567, 100.5018), 0.27° of latitude from the center to each edge. It contains these OpenStreetMap features:
 

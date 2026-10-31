@@ -6,6 +6,8 @@ import { useZonedTime } from "@/features/local-time/use-zoned-time";
 /** Bangkok is UTC+7 all year, with no daylight saving time. */
 export const TIME_ZONE = "Asia/Bangkok";
 
+export const ZONE_LABEL = "GMT+7";
+
 type SkyStyle = CSSProperties & {
   "--sky-base": string;
   "--sky-ink": string;

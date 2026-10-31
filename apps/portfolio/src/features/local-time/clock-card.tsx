@@ -2,9 +2,7 @@ import { LensClock } from "@my-website/ui/components/lens-clock";
 import { cn } from "@my-website/ui/lib/utils";
 
 import { PixelatedGradient } from "@/components/pixelated/gradient";
-import { TIME_ZONE, useLocalSky } from "@/features/local-time/use-local-sky";
-
-const ZONE_LABEL = "GMT+7";
+import { TIME_ZONE, useLocalSky, ZONE_LABEL } from "@/features/local-time/use-local-sky";
 
 /** Points the clock palette at the current sky colors. */
 const SKY_CLOCK =
