@@ -9,7 +9,6 @@ import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
 import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBar } from "@/components/profile/bar";
-import { ProfileCard } from "@/components/profile/card";
 import { Twist } from "@/components/textures/twist";
 import { ExperienceCard } from "@/features/experience/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
@@ -35,7 +34,7 @@ const HomeComponent = () => {
         <div className="@container grid lg:grid-cols-[max-content_minmax(0,1fr)]">
           <header
             ref={headerRef}
-            className="mt-8 flex min-w-0 self-start border-t max-lg:items-end lg:w-(--avatar) lg:flex-col"
+            className="mt-8 flex min-w-0 self-start border-t max-lg:items-end lg:sticky lg:top-0 lg:w-(--avatar) lg:flex-col"
           >
             <ProfileAvatar
               src={profile.avatarSrc}
@@ -84,7 +83,7 @@ const HomeComponent = () => {
                 </PixelatedBlockReveal>
               </Block>
             </Grid>
-            {/* Temporary scroll space to preview the profile card. */}
+            {/* Temporary scroll space to preview the sticky header. */}
             <div aria-hidden className="h-[300vh]" />
           </div>
         </div>
@@ -99,11 +98,6 @@ const HomeComponent = () => {
             className="fixed inset-x-0 top-0 z-10 lg:hidden"
           />
           <ProfileBar {...profile} className="fixed inset-x-0 top-0 z-10 lg:hidden" />
-          <div className="pointer-events-none fixed inset-x-0 top-0 z-10 hidden lg:block">
-            <div className="@container mx-auto w-full max-w-10xl border-x border-transparent">
-              <ProfileCard {...profile} className="pointer-events-auto w-(--avatar)" />
-            </div>
-          </div>
         </>
       )}
     </main>
