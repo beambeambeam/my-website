@@ -10,6 +10,7 @@ import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
+import { Twist } from "@/components/textures/twist";
 import { ExperienceCard } from "@/features/experience/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
 import { LocalTimeCard } from "@/features/local-time/card";
@@ -55,7 +56,11 @@ const HomeComponent = () => {
                 </PixelatedBlockReveal>
               </Block>
               {/* Empty space beside the content. Hidden below md. */}
-              <Block cols={2} className="max-md:hidden" />
+              <Block cols={2} className="py-1.5 max-md:hidden">
+                <PixelatedBlockReveal>
+                  <Twist />
+                </PixelatedBlockReveal>
+              </Block>
               <Block cols={4} rows={3} className="max-md:hidden" />
               <Block cols={4}>
                 <PixelatedBlockReveal>

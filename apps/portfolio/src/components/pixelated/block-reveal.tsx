@@ -21,7 +21,8 @@ interface PixelatedBlockRevealProps {
 /**
  * Shows its content from top to bottom when it scrolls into view. Colored pixel blocks trace the
  * text, icons, and borders of the content, then sharpen into the content. The sweep covers only
- * this content, so grid lines around it stay static.
+ * this content, so grid lines around it stay static. Fills the height of its parent, so content
+ * sized to its parent still fits.
  */
 export const PixelatedBlockReveal = ({
   children,
@@ -54,8 +55,8 @@ export const PixelatedBlockReveal = ({
   }, [inView, reduceMotion, duration, delay]);
 
   return (
-    <div className="relative">
-      <div ref={contentRef} className="relative motion-safe:[clip-path:inset(0_0_100%_0)]">
+    <div className="relative h-full">
+      <div ref={contentRef} className="relative h-full motion-safe:[clip-path:inset(0_0_100%_0)]">
         {children}
       </div>
       <canvas
