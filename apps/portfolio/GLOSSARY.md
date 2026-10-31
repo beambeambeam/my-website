@@ -2,6 +2,14 @@
 
 The personal portfolio site at thisisbeam.fyi. It presents the owner, their work, and the tools they use.
 
+## Layout
+
+**Row**: A full-width horizontal strip of the home page. It holds one or more blocks. _Avoid_: Section, band
+
+**Block**: One unit of content inside a row, such as the local time or the tools. Blocks in a row sit side by side and stack on narrow screens. _Avoid_: Card, tile
+
+**Grid line**: A 1px rule between rows or between blocks. Horizontal grid lines run to the page edge, past the last block. _Avoid_: Border, divider
+
 ## Tools
 
 **Tool**: A language, library, framework, or product the owner works with a lot. Shown in the "I work a lot with" card. _Avoid_: Tech, skill, stack item
