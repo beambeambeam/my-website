@@ -51,7 +51,7 @@ const HomeComponent = () => {
             <Grid className="lg:mt-8">
               <Block cols={8} className="flex items-end p-4 sm:p-6">
                 <h2 className="text-xl tracking-tight sm:text-2xl">
-                  <span className="block">
+                  <span className="block font-serif">
                     <PixelatedTextReveal text="Hi, I'm Beam." />
                   </span>
                   <span className="block text-muted-foreground">
