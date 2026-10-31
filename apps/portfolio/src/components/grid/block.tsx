@@ -6,6 +6,7 @@ const colSpans = {
   1: "col-span-1",
   2: "col-span-full md:col-span-2",
   4: "col-span-full md:col-span-4",
+  8: "col-span-full",
 };
 
 const rowSpans = { 1: "row-span-1", 3: "row-span-3" };

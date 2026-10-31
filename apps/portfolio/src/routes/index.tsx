@@ -49,6 +49,16 @@ const HomeComponent = () => {
           </header>
           <div className="mt-8 min-w-0 border-l lg:mt-0">
             <Grid className="lg:mt-8">
+              <Block cols={8} className="flex items-end p-4 sm:p-6">
+                <h2 className="text-xl tracking-tight sm:text-2xl">
+                  <span className="block">
+                    <PixelatedTextReveal text="Hi, I'm Beam." />
+                  </span>
+                  <span className="block text-muted-foreground">
+                    <PixelatedTextReveal text="Software & Design Engineer. I love blending pixels with reality." />
+                  </span>
+                </h2>
+              </Block>
               {/* A gutter keeps the grid lines visible beside the dark night sky. */}
               <Block cols={2} className="p-px">
                 <PixelatedBlockReveal>
