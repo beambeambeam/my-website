@@ -22,6 +22,9 @@ const T_MAX = 26.5;
 const BAR_LEN = 44;
 const STRETCH_MAX = T_MAX / T_MIN;
 
+/** Resting bars stay faint, so the texture sits quietly beside the content. */
+const IDLE_OPACITY = 0.1;
+
 /** Below this size in px the texture stays at rest. */
 const MIN_W = 160;
 const MIN_H = 112;
@@ -169,7 +172,8 @@ const stepBar = (bar: Bar, cell: Point, { x, y, active, reduced }: Pointer, dt: 
 
 /**
  * Writes the bar transform and fill only when they changed enough to see. A resting bar keeps the
- * text color. A widening bar mixes in its Dia color, all of it at the widest.
+ * faint text color. A widening bar mixes in its Dia color and grows opaque, both in full at the
+ * widest.
  */
 const writeBar = (bar: Bar, cell: Cell, element: SVGRectElement | null) => {
   const atRest = bar.angle === 0 && bar.stretch === 1;
@@ -191,6 +195,8 @@ const writeBar = (bar: Bar, cell: Cell, element: SVGRectElement | null) => {
     ? ""
     : `rotate(${bar.angle.toFixed(2)}deg) scaleX(${bar.stretch.toFixed(3)})`;
   element.style.fill = mix === 0 ? "" : `color-mix(in oklab, currentColor, ${cell.color} ${mix}%)`;
+  element.style.fillOpacity =
+    mix === 0 ? "" : String(IDLE_OPACITY + (1 - IDLE_OPACITY) * (mix / 100));
 };
 
 /**
@@ -500,6 +506,7 @@ export const Twist = ({ className }: TwistProps) => {
         aria-hidden="true"
         focusable="false"
         fill="currentColor"
+        fillOpacity={IDLE_OPACITY}
         className="absolute inset-0 block size-full"
       >
         {CELLS.map(({ x, y }, index) => (
