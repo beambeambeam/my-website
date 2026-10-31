@@ -1,9 +1,5 @@
 import { educations, experiences } from "@/features/experience/data";
 
-interface ExperienceCardProps {
-  className?: string;
-}
-
 interface ExperienceItem {
   title: string;
   period: string;
@@ -30,7 +26,7 @@ interface ExperienceListProps {
 const ExperienceList = ({ heading, items }: ExperienceListProps) => (
   <>
     <h2 className="p-4 text-xs text-muted-foreground uppercase">{heading}</h2>
-    <ul className="divide-y border-y">
+    <ul className="divide-y border-y last:border-b-0">
       {items.map((item) => (
         <li key={item.title} className="p-4">
           <div className="flex items-baseline justify-between gap-4">
@@ -46,8 +42,8 @@ const ExperienceList = ({ heading, items }: ExperienceListProps) => (
   </>
 );
 
-export const ExperienceCard = ({ className }: ExperienceCardProps) => (
-  <div className={className}>
+export const ExperienceCard = () => (
+  <div>
     <ExperienceList heading="Where I have worked" items={experienceItems} />
     <ExperienceList heading="Education" items={educationItems} />
   </div>

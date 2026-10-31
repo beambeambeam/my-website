@@ -26,11 +26,7 @@ type SkyStyle = CSSProperties & {
 const SKY_CLOCK =
   "bg-none [--lc-accent:var(--sky-accent)] [--lc-lume:var(--sky-stripe)] [--lc-tick:var(--sky-muted)] [--lc-label:var(--sky-muted)] [--lc-spoke:var(--sky-ink)] [--lc-hand:var(--sky-ink)] [--lc-hand-edge:transparent] [--lc-pivot-from:var(--sky-muted)] [--lc-pivot-to:var(--sky-ink)] [--lc-sleeve:var(--sky-ink)]";
 
-interface LocalTimeCardProps {
-  className?: string;
-}
-
-export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
+export const LocalTimeCard = () => {
   const time = useZonedTime(TIME_ZONE);
   const sky = skyAt(Number(time.slice(0, 2)));
 
@@ -45,10 +41,7 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
   return (
     <div
       style={style}
-      className={cn(
-        "relative isolate box-content grid w-72 max-w-full text-(--sky-ink) sm:grid-cols-2",
-        className,
-      )}
+      className="relative isolate box-content grid w-72 max-w-full text-(--sky-ink) sm:grid-cols-2"
     >
       <PixelatedGradient base={sky.base} glows={sky.glows} className="-z-10" />
       <h2 className="sr-only">

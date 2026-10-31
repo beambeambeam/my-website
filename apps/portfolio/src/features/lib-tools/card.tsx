@@ -12,20 +12,16 @@ interface HoveredTool {
   tool: Tool;
 }
 
-interface LibsToolsCardProps {
-  className?: string;
-}
-
 const toolNames = [
   "these tools",
   ...toolCategories.flatMap((category) => category.tools.map((tool) => tool.name)),
 ];
 
-export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
+export const LibsToolsCard = () => {
   const [hovered, setHovered] = useState<HoveredTool | null>(null);
 
   return (
-    <div className={className}>
+    <div>
       <h2 className="sr-only">Libs &amp; Tools</h2>
       <div className="grid md:grid-cols-[max-content_minmax(0,1fr)]">
         <div className="flex w-fit flex-col p-4">

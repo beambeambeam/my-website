@@ -3,6 +3,9 @@ import { useRef } from "react";
 
 import { Footer } from "@/components/footer";
 import { GradualBlur } from "@/components/gradual-blur";
+import { Block } from "@/components/grid/block";
+import { Grid } from "@/components/grid/grid";
+import { Row } from "@/components/grid/row";
 import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
 import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
@@ -44,22 +47,30 @@ const HomeComponent = () => {
               </p>
             </div>
           </header>
-          <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
-            <section className="border-y lg:mt-8">
-              <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
-                <LocalTimeCard className="border-y border-r lg:border-l" />
-              </PixelatedBlockReveal>
-            </section>
-            <section className="border-b">
-              <PixelatedBlockReveal className="-mb-px w-fit max-w-full lg:-ml-px">
-                <ExperienceCard className="w-130 max-w-full border-r border-b lg:border-l" />
-              </PixelatedBlockReveal>
-            </section>
-            <section className="border-b">
-              <PixelatedBlockReveal className="-mb-px w-fit max-w-full lg:-ml-px">
-                <LibsToolsCard className="w-130 max-w-full border-r border-b lg:border-l" />
-              </PixelatedBlockReveal>
-            </section>
+          <div className="mt-8 min-w-0 lg:mt-0">
+            <Grid className="lg:mt-8">
+              <Row>
+                <Block>
+                  <PixelatedBlockReveal>
+                    <LocalTimeCard />
+                  </PixelatedBlockReveal>
+                </Block>
+              </Row>
+              <Row>
+                <Block size="wide">
+                  <PixelatedBlockReveal>
+                    <ExperienceCard />
+                  </PixelatedBlockReveal>
+                </Block>
+              </Row>
+              <Row>
+                <Block size="wide">
+                  <PixelatedBlockReveal>
+                    <LibsToolsCard />
+                  </PixelatedBlockReveal>
+                </Block>
+              </Row>
+            </Grid>
             {/* Temporary scroll space to preview the profile card. */}
             <div aria-hidden className="h-[300vh]" />
           </div>
