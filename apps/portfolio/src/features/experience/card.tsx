@@ -25,7 +25,7 @@ interface ExperienceListProps {
 
 const ExperienceList = ({ heading, items }: ExperienceListProps) => (
   <>
-    <h2 className="p-4 text-xs text-muted-foreground uppercase">{heading}</h2>
+    <h2 className="p-4 font-serif text-base text-muted-foreground">{heading}</h2>
     <ul className="divide-y border-y last:border-b-0">
       {items.map((item) => (
         <li key={item.title} className="p-4">
@@ -44,7 +44,7 @@ const ExperienceList = ({ heading, items }: ExperienceListProps) => (
 
 export const ExperienceCard = () => (
   <div>
-    <ExperienceList heading="Where I have worked" items={experienceItems} />
+    <ExperienceList heading="Experience" items={experienceItems} />
     <ExperienceList heading="Education" items={educationItems} />
   </div>
 );
