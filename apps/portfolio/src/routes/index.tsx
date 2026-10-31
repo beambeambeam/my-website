@@ -52,10 +52,12 @@ const HomeComponent = () => {
             </section>
             <section className="border-b">
               <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
-                <div className="flex flex-col border-y border-r md:flex-row lg:border-l">
-                  <ExperienceCard className="md:w-md" />
-                  <LibsToolsCard className="border-t md:border-t-0 md:border-l" />
-                </div>
+                <ExperienceCard className="border-y border-r md:w-md lg:border-l" />
+              </PixelatedBlockReveal>
+            </section>
+            <section className="border-b">
+              <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
+                <LibsToolsCard className="border-y border-r lg:border-l" />
               </PixelatedBlockReveal>
             </section>
             {/* Temporary scroll space to preview the profile card. */}

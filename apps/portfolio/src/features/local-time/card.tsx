@@ -11,9 +11,6 @@ const TIME_ZONE = "Asia/Bangkok";
 
 const ZONE_LABEL = "GMT+7";
 
-/** Central Bangkok. */
-const COORDINATES = "13.7563° N, 100.5018° E";
-
 /** Map of central Bangkok from OpenStreetMap. See `public/statics/maps/README.md`. */
 const MAP_SRC = "/statics/maps/bangkok.svg";
 
@@ -49,7 +46,7 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
     <div
       style={style}
       className={cn(
-        "relative isolate grid w-144 max-w-full text-(--sky-ink) sm:grid-cols-2",
+        "relative isolate grid w-72 max-w-full text-(--sky-ink) sm:grid-cols-2",
         className,
       )}
     >
@@ -69,8 +66,6 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
         </p>
         <div className="absolute top-0 left-0 p-4">
           <p className="text-xs text-(--sky-muted) uppercase">I&apos;m based in</p>
-          <p className="font-mono text-sm font-bold">{COORDINATES}</p>
-          <p className="font-mono text-sm font-bold">{ZONE_LABEL}</p>
         </div>
         <a
           href="https://www.openstreetmap.org/copyright"
@@ -81,11 +76,14 @@ export const LocalTimeCard = ({ className }: LocalTimeCardProps) => {
           © OpenStreetMap
         </a>
       </div>
-      <LensClock
-        timeZone={TIME_ZONE}
-        theme="light"
-        className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
-      />
+      <div className="relative">
+        <LensClock
+          timeZone={TIME_ZONE}
+          theme="light"
+          className={cn("w-full rounded-none shadow-none", SKY_CLOCK)}
+        />
+        <p className="absolute bottom-0 left-0 p-2 font-mono text-xs font-bold">{ZONE_LABEL}</p>
+      </div>
     </div>
   );
 };
