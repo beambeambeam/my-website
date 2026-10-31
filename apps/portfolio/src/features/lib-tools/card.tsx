@@ -28,7 +28,7 @@ export const LibsToolsCard = () => {
           <p className="text-xs text-muted-foreground uppercase">I work a lot with</p>
           <div
             aria-hidden="true"
-            className="grid h-6 overflow-hidden font-mono text-sm font-bold whitespace-nowrap uppercase"
+            className="grid h-7 overflow-hidden font-serif text-lg font-bold whitespace-nowrap"
           >
             {toolNames.map((name) => (
               <span key={name} className="invisible col-start-1 row-start-1">
