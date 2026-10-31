@@ -5,7 +5,6 @@ import { Footer } from "@/components/footer";
 import { GradualBlur } from "@/components/gradual-blur";
 import { Block } from "@/components/grid/block";
 import { Grid } from "@/components/grid/grid";
-import { Row } from "@/components/grid/row";
 import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
 import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
@@ -13,7 +12,8 @@ import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
 import { ExperienceCard } from "@/features/experience/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
-import { LocalTimeCard } from "@/features/local-time/card";
+import { LocalTimeClockCard } from "@/features/local-time/clock-card";
+import { LocalTimeMapCard } from "@/features/local-time/map-card";
 import { useInView } from "@/hooks/use-in-view";
 
 const profile = {
@@ -49,27 +49,28 @@ const HomeComponent = () => {
           </header>
           <div className="mt-8 min-w-0 lg:mt-0">
             <Grid className="lg:mt-8">
-              <Row>
-                <Block>
-                  <PixelatedBlockReveal>
-                    <LocalTimeCard />
-                  </PixelatedBlockReveal>
-                </Block>
-              </Row>
-              <Row>
-                <Block size="wide">
-                  <PixelatedBlockReveal>
-                    <ExperienceCard />
-                  </PixelatedBlockReveal>
-                </Block>
-              </Row>
-              <Row>
-                <Block size="wide">
-                  <PixelatedBlockReveal>
-                    <LibsToolsCard />
-                  </PixelatedBlockReveal>
-                </Block>
-              </Row>
+              <Block>
+                <PixelatedBlockReveal>
+                  <LocalTimeMapCard />
+                </PixelatedBlockReveal>
+              </Block>
+              <Block>
+                <PixelatedBlockReveal>
+                  <LocalTimeClockCard />
+                </PixelatedBlockReveal>
+              </Block>
+              {/* Empty space beside the content. Hidden below md. */}
+              <Block cols={2} rows={3} className="max-md:hidden" />
+              <Block cols={2}>
+                <PixelatedBlockReveal>
+                  <ExperienceCard />
+                </PixelatedBlockReveal>
+              </Block>
+              <Block cols={2}>
+                <PixelatedBlockReveal>
+                  <LibsToolsCard />
+                </PixelatedBlockReveal>
+              </Block>
             </Grid>
             {/* Temporary scroll space to preview the profile card. */}
             <div aria-hidden className="h-[300vh]" />
