@@ -217,7 +217,8 @@ export const getElementSource = async (
     }
   }
 
-  const images = element.querySelectorAll("img, svg, [style*='mask-image']");
+  // A nested SVG already shows inside its outer SVG, so trace only the outer one.
+  const images = element.querySelectorAll("img, svg:not(svg svg), [style*='mask-image']");
 
   await Promise.all(
     [...images].map(async (node) => {
@@ -240,7 +241,8 @@ export const getElementSource = async (
     }),
   );
 
-  for (const node of [element, ...element.querySelectorAll("*")]) {
+  // SVG content has no CSS borders, so skip it.
+  for (const node of [element, ...element.querySelectorAll("*:not(svg *)")]) {
     const style = getComputedStyle(node);
     const rect = node.getBoundingClientRect();
     const x = rect.left - origin.left;
