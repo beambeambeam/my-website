@@ -46,9 +46,10 @@ const HomeComponent = () => {
               </p>
             </div>
           </header>
-          <div className="mt-8 min-w-0 lg:mt-0">
+          <div className="mt-8 min-w-0 border-l lg:mt-0">
             <Grid className="lg:mt-8">
-              <Block cols={2}>
+              {/* A gutter keeps the grid lines visible beside the dark night sky. */}
+              <Block cols={2} className="p-px">
                 <PixelatedBlockReveal>
                   <LocalTimeCard />
                 </PixelatedBlockReveal>
