@@ -6,7 +6,6 @@ import { GradualBlur } from "@/components/gradual-blur";
 import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
 import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
-import { ProfileBanner } from "@/components/profile/banner";
 import { ProfileBar } from "@/components/profile/bar";
 import { ProfileCard } from "@/components/profile/card";
 import { ExperienceCard } from "@/features/experience/card";
@@ -18,7 +17,6 @@ const profile = {
   name: "Supawit Marayat",
   title: "Software & Design Engineer",
   avatarSrc: "/statics/placeholder/avatar.svg",
-  bannerSrc: "/statics/placeholder/banner.svg",
 };
 
 const HomeComponent = () => {
@@ -27,7 +25,6 @@ const HomeComponent = () => {
 
   return (
     <main>
-      <ProfileBanner src={profile.bannerSrc} alt="Profile banner" />
       <div className="mx-auto w-full max-w-10xl border-r">
         <div className="@container grid gap-x-6 pl-4 sm:pl-6 lg:grid-cols-[max-content_minmax(0,1fr)]">
           <header ref={headerRef} className="min-w-0 self-start pr-4 sm:pr-6 lg:pr-0">
@@ -36,7 +33,7 @@ const HomeComponent = () => {
               alt={profile.name}
               fallback={profile.name.charAt(0)}
               size="max(4.8rem,14cqw)"
-              className="-mt-[calc(var(--avatar-size)/3)]"
+              className="mt-6"
             />
             <div className="mt-4 space-y-1">
               <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">
