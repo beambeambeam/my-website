@@ -12,7 +12,7 @@ export const experiences: Experience[] = [
     role: "Software Engineer Intern",
   },
   {
-    company: "KMUTT Computer Engineering",
+    company: "CPE KMUTT",
     period: "Jan 2026 – Now",
     role: "Fullstack Web Developer",
   },

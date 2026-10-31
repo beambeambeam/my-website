@@ -32,7 +32,7 @@ const HomeComponent = () => {
               src={profile.avatarSrc}
               alt={profile.name}
               fallback={profile.name.charAt(0)}
-              size="max(4.8rem,14cqw)"
+              size="round(max(4.8rem,14cqw),1px)"
               className="mt-6"
             />
             <div className="mt-4 space-y-1">
@@ -51,13 +51,13 @@ const HomeComponent = () => {
               </PixelatedBlockReveal>
             </section>
             <section className="border-b">
-              <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
-                <ExperienceCard className="w-fit border-y border-r lg:border-l" />
+              <PixelatedBlockReveal className="-mb-px w-fit max-w-full lg:-ml-px">
+                <ExperienceCard className="w-130 max-w-full border-r border-b lg:border-l" />
               </PixelatedBlockReveal>
             </section>
             <section className="border-b">
-              <PixelatedBlockReveal className="-my-px w-fit max-w-full lg:-ml-px">
-                <LibsToolsCard className="border-y border-r lg:border-l" />
+              <PixelatedBlockReveal className="-mb-px w-fit max-w-full lg:-ml-px">
+                <LibsToolsCard className="w-130 max-w-full border-r border-b lg:border-l" />
               </PixelatedBlockReveal>
             </section>
             {/* Temporary scroll space to preview the profile card. */}
