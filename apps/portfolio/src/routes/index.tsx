@@ -27,6 +27,8 @@ const AVATAR_VARS =
 const HomeComponent = () => {
   const headerRef = useRef<HTMLElement>(null);
   const headerInView = useInView(headerRef);
+  const greetingRef = useRef<HTMLHeadingElement>(null);
+  const greetingInView = useInView(greetingRef);
 
   return (
     <main className={AVATAR_VARS}>
@@ -42,15 +44,22 @@ const HomeComponent = () => {
               fallback={profile.name.charAt(0)}
               className="w-24 shrink-0 border-r sm:w-32 lg:w-full lg:border-r-0 lg:border-b"
             />
-            <h1 className="p-3 font-serif text-2xl tracking-tight">
-              <PixelatedTextReveal text={profile.name} />
-            </h1>
+            <div className="p-3 font-serif text-2xl tracking-tight">
+              <h1>
+                <PixelatedTextReveal text={profile.name} />
+              </h1>
+              {!greetingInView && (
+                <p className="font-sans text-base whitespace-nowrap text-muted-foreground">
+                  <PixelatedTextReveal text={profile.title} startOnView={false} />
+                </p>
+              )}
+            </div>
           </header>
           <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
             <Grid className="lg:mt-8">
               {/* On lg, rows 1 and 2 end at the bottom line of the avatar. */}
               <Block cols={8} className="flex items-end p-4 sm:p-6 lg:min-h-(--greeting-h)">
-                <h2 className="text-xl tracking-tight sm:text-2xl">
+                <h2 ref={greetingRef} className="text-xl tracking-tight sm:text-2xl">
                   <span className="block font-serif">
                     <PixelatedTextReveal text="Hi, I'm Beam." />
                   </span>
