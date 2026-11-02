@@ -92,8 +92,6 @@ const HomeComponent = () => {
                 </PixelatedBlockReveal>
               </Block>
             </Grid>
-            {/* Temporary scroll space to preview the sticky header. */}
-            <div aria-hidden className="h-[300vh]" />
           </div>
         </div>
       </div>
