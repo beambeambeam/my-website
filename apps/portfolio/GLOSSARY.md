@@ -2,6 +2,12 @@
 
 The personal portfolio site at thisisbeam.fyi. It presents the owner, their work, and the tools they use.
 
+## Layout
+
+**Block**: One unit of content on the home grid, such as the local time or the tools. A block spans one or more columns and rows. An empty block fills the space beside the content. _Avoid_: Card, tile, row
+
+**Grid line**: A 1px rule between rows or between blocks. Lines do not run through a block that spans several rows or columns. _Avoid_: Border, divider
+
 ## Tools
 
 **Tool**: A language, library, framework, or product the owner works with a lot. Shown in the "I work a lot with" card. _Avoid_: Tech, skill, stack item

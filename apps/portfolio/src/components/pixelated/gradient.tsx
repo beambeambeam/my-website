@@ -20,6 +20,36 @@ interface PixelatedGradientProps {
   className?: string;
 }
 
+/** 4×4 Bayer matrix. Each entry is the threshold rank of that pixel in its tile. */
+const BAYER = [0, 8, 2, 10, 12, 4, 14, 6, 3, 11, 1, 9, 15, 7, 13, 5];
+
+/** Channel step between the colors that remain. Larger steps give wider bands. */
+const STEP = 16;
+
+/**
+ * Snaps every channel to a multiple of `STEP` with ordered dithering. The soft glows become flat
+ * bands, and a fixed checker pattern blends each band into the next, like pixel art.
+ */
+const dither = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  const image = ctx.getImageData(0, 0, width, height);
+  const { data } = image;
+
+  for (let y = 0; y < height; y += 1) {
+    for (let x = 0; x < width; x += 1) {
+      const offset = ((BAYER[(y % 4) * 4 + (x % 4)] ?? 0) + 0.5) / 16 - 0.5;
+      const index = (y * width + x) * 4;
+
+      for (let channel = 0; channel < 3; channel += 1) {
+        const value = data[index + channel] ?? 0;
+
+        data[index + channel] = Math.min(255, Math.round(value / STEP + offset) * STEP);
+      }
+    }
+  }
+
+  ctx.putImageData(image, 0, 0);
+};
+
 /** Draws one canvas pixel per `cell` CSS pixels of the canvas box. */
 const paint = (
   canvas: HTMLCanvasElement,
@@ -46,6 +76,8 @@ const paint = (
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
   }
+
+  dither(ctx, width, height);
 };
 
 /**

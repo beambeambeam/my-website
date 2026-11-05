@@ -1,4 +1,3 @@
-import { cn } from "@my-website/ui/lib/utils";
 import { useInView, useReducedMotion } from "motion/react";
 import type { ReactNode } from "react";
 import { useEffect, useRef } from "react";
@@ -17,19 +16,18 @@ interface PixelatedBlockRevealProps {
   duration?: number;
   /** Delay before the sweep starts, in seconds. */
   delay?: number;
-  className?: string;
 }
 
 /**
  * Shows its content from top to bottom when it scrolls into view. Colored pixel blocks trace the
- * text, icons, and borders of the content, then sharpen into the content. Pull the block over page
- * grid lines with negative margins to reveal its borders in place of those lines.
+ * text, icons, and borders of the content, then sharpen into the content. The sweep covers only
+ * this content, so grid lines around it stay static. Fills the height of its parent, so content
+ * sized to its parent still fits.
  */
 export const PixelatedBlockReveal = ({
   children,
   duration = 1.2,
   delay = 0,
-  className,
 }: PixelatedBlockRevealProps) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -57,10 +55,8 @@ export const PixelatedBlockReveal = ({
   }, [inView, reduceMotion, duration, delay]);
 
   return (
-    <div className={cn("relative", className)}>
-      {/* Hides page grid lines behind the block, so the block's own borders reveal over them. */}
-      <div aria-hidden="true" data-pixel-ignore className="absolute inset-0 bg-background" />
-      <div ref={contentRef} className="relative motion-safe:[clip-path:inset(0_0_100%_0)]">
+    <div className="relative h-full">
+      <div ref={contentRef} className="relative h-full motion-safe:[clip-path:inset(0_0_100%_0)]">
         {children}
       </div>
       <canvas

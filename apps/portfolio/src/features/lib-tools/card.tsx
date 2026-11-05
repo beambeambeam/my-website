@@ -12,27 +12,23 @@ interface HoveredTool {
   tool: Tool;
 }
 
-interface LibsToolsCardProps {
-  className?: string;
-}
-
 const toolNames = [
   "these tools",
   ...toolCategories.flatMap((category) => category.tools.map((tool) => tool.name)),
 ];
 
-export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
+export const LibsToolsCard = () => {
   const [hovered, setHovered] = useState<HoveredTool | null>(null);
 
   return (
-    <div className={className}>
+    <div>
       <h2 className="sr-only">Libs &amp; Tools</h2>
       <div className="grid md:grid-cols-[max-content_minmax(0,1fr)]">
         <div className="flex w-fit flex-col p-4">
           <p className="text-xs text-muted-foreground uppercase">I work a lot with</p>
           <div
             aria-hidden="true"
-            className="grid h-8 overflow-hidden font-mono text-lg font-bold whitespace-nowrap uppercase"
+            className="grid h-7 overflow-hidden font-serif text-lg font-bold whitespace-nowrap"
           >
             {toolNames.map((name) => (
               <span key={name} className="invisible col-start-1 row-start-1">
@@ -64,12 +60,12 @@ export const LibsToolsCard = ({ className }: LibsToolsCardProps) => {
               >
                 {category.label}
               </h3>
-              <ul className="flex flex-wrap gap-2">
+              <ul className="flex flex-wrap gap-3">
                 {category.tools.map((tool) => (
                   <motion.li
                     key={tool.name}
                     className={cn(
-                      "size-10 transition-opacity duration-200",
+                      "size-8 transition-opacity duration-200",
                       hovered !== null && hovered.tool.name !== tool.name && "opacity-30",
                     )}
                     whileHover={{ scale: 1.1 }}
