@@ -1,4 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { AnimatePresence } from "motion/react";
 import { useRef } from "react";
 
 import { Footer } from "@/components/footer";
@@ -48,11 +49,16 @@ const HomeComponent = () => {
               <h1>
                 <PixelatedTextReveal text={profile.name} />
               </h1>
-              {!greetingInView && (
-                <p className="font-sans text-base whitespace-nowrap text-muted-foreground">
-                  <PixelatedTextReveal text={profile.title} startOnView={false} />
-                </p>
-              )}
+              <AnimatePresence>
+                {!greetingInView && (
+                  <p
+                    key="title"
+                    className="font-sans text-base whitespace-nowrap text-muted-foreground"
+                  >
+                    <PixelatedTextReveal text={profile.title} startOnView={false} />
+                  </p>
+                )}
+              </AnimatePresence>
             </div>
           </header>
           <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
