@@ -90,16 +90,19 @@ const diaAt = (t: number) => {
   return `color-mix(in oklab, ${from}, ${to} ${Math.round((scaled - index) * 100)}%)`;
 };
 
-/** Row by row. The Dia colors run from the top-left corner to the bottom-right corner. */
+/** Center of the radial Dia colors: the middle of the left edge, next to the local time card. */
+const ORIGIN: Point = { x: 0, y: H / 2 };
+const MAX_REACH = Math.hypot(W - ORIGIN.x, Math.max(ORIGIN.y, H - ORIGIN.y));
+
+/** Row by row. The Dia colors radiate from `ORIGIN`, pink at the center to lime at the far corners. */
 const CELLS: Cell[] = Array.from({ length: ROWS * COLS }, (_, index) => {
   const col = index % COLS;
   const row = Math.floor(index / COLS);
+  const x = Math.round((X0 + col * PITCH_X) * 100) / 100;
+  const y = Math.round((Y0 + row * PITCH_Y) * 100) / 100;
+  const reach = Math.hypot(x + CELL_W / 2 - ORIGIN.x, y + CELL_H / 2 - ORIGIN.y);
 
-  return {
-    x: Math.round((X0 + col * PITCH_X) * 100) / 100,
-    y: Math.round((Y0 + row * PITCH_Y) * 100) / 100,
-    color: diaAt((col / (COLS - 1) + row / (ROWS - 1)) / 2),
-  };
+  return { x, y, color: diaAt(Math.min(reach / MAX_REACH, 1)) };
 });
 
 /** Wraps an angle in degrees to -90..90, because a bar looks the same turned by 180°. */
