@@ -7,8 +7,7 @@ type Rgb = [number, number, number];
 
 /** Shades of shark skin per kind, from the background color (0) to the foreground color. */
 export const SKIN_LEVELS = 48;
-export const FISH_ALPHAS = [0.28, 0.42, 0.58, 0.74, 0.9] as const;
-export const WAKE_LEVELS = 6;
+export const FISH_ALPHAS = [0.2, 0.3, 0.42, 0.56, 0.72] as const;
 export const HEAT_LEVELS = 8;
 
 /** Every fill style the renderer uses, built once per theme. */
@@ -17,18 +16,15 @@ export interface Palette {
   skin: string[][];
   /** Dark skin markings per kind. */
   marks: string[];
-  /** Glyph on bright skin, and on dim skin. */
-  glyphOnLight: string;
-  glyphOnDark: string;
   eye: string;
+  /** Glyph on the shadow side of the skin. */
+  glyph: string;
   glint: string;
   accents: readonly string[];
   fish: string[];
-  wake: string[];
   /** Bright Dia orange for a fresh bite, Dia pink as it fades. */
   heatHot: string[];
   heatCool: string[];
-  grid: string;
 }
 
 const HEX = /^#(?<r>[\da-f]{2})(?<g>[\da-f]{2})(?<b>[\da-f]{2})$/iu;
@@ -94,15 +90,12 @@ export const readPalette = (element: Element): Palette => {
       range(SKIN_LEVELS).map((level) => shade(level / (SKIN_LEVELS - 1), ANATOMY[kind].tint)),
     ),
     marks: SHARK_KINDS.map((kind) => shade(0.27, ANATOMY[kind].tint)),
-    glyphOnLight: shade(0.03),
-    glyphOnDark: shade(0.09),
     eye: shade(0.62),
+    glyph: shade(0.09),
     glint: rgb(fg),
     accents: DIA_COLORS,
     fish: FISH_ALPHAS.map((alpha) => rgba(fg, alpha)),
-    wake: range(WAKE_LEVELS).map((level) => rgba(fg, (0.12 * (level + 1)) / 1.2)),
     heatHot: range(HEAT_LEVELS).map((level) => rgba(fromHex(orange), (level + 1) / HEAT_LEVELS)),
     heatCool: range(HEAT_LEVELS).map((level) => rgba(fromHex(pink), (level + 1) / HEAT_LEVELS)),
-    grid: rgba(fg, 0.045),
   };
 };

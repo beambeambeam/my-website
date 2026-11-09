@@ -1,29 +1,29 @@
-import { ANATOMY, SHARK_KINDS } from "./anatomy";
-import type { SharkAnatomy } from "./anatomy";
 /**
  * Draws the World as a grid of ASCII cells:
  *
- * 1. A faint cell grid
- * 2. A wake field that spreads where things swim and lights up cells
- * 3. Fish as one dash per cell, glinting on hard turns
- * 4. Sharks drawn cell by cell with supersampled edges: blocks shaded by the light, dense glyphs, and
- *    Dia accents that shimmer across the skin
+ * 1. Fish as one dash per cell, glinting on hard turns
+ * 2. A flash of Dia colors where a shark bites
+ * 3. Sharks drawn cell by cell with supersampled edges: blocks shaded by the light, glyphs on the
+ *    shadow side, a soft glyph outline, and Dia accents that shimmer across the skin
  *
  * Adapted from ascii-sharks by drewdi (MIT, see LICENSE).
  */
+import { ANATOMY, SHARK_KINDS } from "./anatomy";
+import type { SharkAnatomy } from "./anatomy";
 import { clamp, hash3 } from "./math";
-import { FISH_ALPHAS, HEAT_LEVELS, SKIN_LEVELS, WAKE_LEVELS } from "./palette";
+import { FISH_ALPHAS, HEAT_LEVELS, SKIN_LEVELS } from "./palette";
 import type { Palette } from "./palette";
 import { nodeX, nodeY, SHARK_NODES } from "./world";
 import type { Shark, World } from "./world";
 
-// Sparse glyphs on bright skin and dense glyphs in shadow, so the texture follows the shading.
-const SKIN_RAMP = ":;t%SX8#@";
+// Sparse glyphs on lit shadow and dense glyphs in deep shadow.
+const SHADOW_RAMP = ":;t%SX8#@";
 const FIN_GLYPHS = "%;tS:";
-const RIDGE_GLYPHS = "@8%";
-const MARK_GLYPHS = "#%@";
 const EDGE_HEAVY = ":;";
 const EDGE_LIGHT = ".',`";
+
+/** Body cells darker than this get a glyph. Lighter cells stay plain blocks. */
+const SHADOW_SHADE = 0.45;
 
 const FLAG_BODY = 1;
 const FLAG_EDGE = 2;
@@ -37,10 +37,19 @@ const FLAG_MARK = 6;
 /** Sub-cell sample offsets for smooth silhouettes. */
 const SUBSAMPLES = [0.25, 0.3, 0.75, 0.3, 0.25, 0.72, 0.75, 0.72];
 
-/** Wake below this energy stays dark. */
-const WAKE_FLOOR = 0.45;
-
 const charAt = (set: string, index: number) => set[index % set.length] ?? " ";
+
+/** Glyph of a body or fin cell in shadow, denser where the shadow is deeper. */
+const shadowGlyph = (flag: number, shade: number, key: number) => {
+  if (flag === FLAG_FIN) {
+    return charAt(FIN_GLYPHS, Math.floor(key / 256));
+  }
+
+  const depth = 1 - shade / SHADOW_SHADE;
+  const jitter = (Math.floor(key / 16) % 3) - 1;
+
+  return charAt(SHADOW_RAMP, clamp(Math.floor(depth * 8.99) + jitter, 0, SHADOW_RAMP.length - 1));
+};
 
 /** Skin brightness of a body cell, 0–255, before depth dimming. */
 const cellLevel = (flag: number, shade: number) => {
@@ -67,38 +76,6 @@ const cellLevel = (flag: number, shade: number) => {
   }
 };
 
-/** Glyph of a body cell. Plain skin picks denser glyphs in shadow. */
-const cellGlyph = (flag: number, shade: number, key: number) => {
-  const pick = Math.floor(key / 256);
-
-  switch (flag) {
-    case FLAG_RIDGE: {
-      return charAt(RIDGE_GLYPHS, pick);
-    }
-
-    case FLAG_EYE: {
-      return "o";
-    }
-
-    case FLAG_MARK: {
-      return charAt(MARK_GLYPHS, pick);
-    }
-
-    case FLAG_FIN: {
-      return charAt(FIN_GLYPHS, pick);
-    }
-
-    default: {
-      const jitter = (Math.floor(key / 16) % 3) - 1;
-
-      return charAt(
-        SKIN_RAMP,
-        clamp(Math.floor((1 - shade) * 8.99) + jitter, 0, SKIN_RAMP.length - 1),
-      );
-    }
-  }
-};
-
 const inTriangle = (
   px: number,
   py: number,
@@ -114,20 +91,14 @@ const inTriangle = (
 export class AsciiRenderer {
   private readonly ctx: CanvasRenderingContext2D;
   private readonly canvas: HTMLCanvasElement;
-  /** The grid, drawn once per resize. */
-  private readonly gridLayer: HTMLCanvasElement;
   private palette: Palette;
   private fontFamily = "ui-monospace, Menlo, monospace";
   private dpr = 1;
-  private width = 0;
-  private height = 0;
   private cw = 12;
   private ch = 18;
   private cols = 0;
   private rows = 0;
 
-  private energy = new Float32Array(0);
-  private energyTmp = new Float32Array(0);
   private heat = new Float32Array(0);
 
   private sharkFlag = new Uint8Array(0);
@@ -151,12 +122,11 @@ export class AsciiRenderer {
   private hitV = 0;
   private hitDist = 0;
 
-  /** Frame stamp of the cells that hold a fish. Wake dots skip them. */
+  /** Frame stamp of the cells that hold a fish, so each cell draws one fish. */
   private fishStamp = new Uint32Array(0);
   private frameId = 0;
   /** Fish cells by brightness, so each bucket is one fill style. */
   private readonly fishBuckets: number[][] = FISH_ALPHAS.map(() => []);
-  private readonly wakeBuckets: number[][] = Array.from({ length: WAKE_LEVELS }, () => []);
 
   constructor(canvas: HTMLCanvasElement, palette: Palette) {
     const ctx = canvas.getContext("2d");
@@ -168,7 +138,6 @@ export class AsciiRenderer {
     this.canvas = canvas;
     this.ctx = ctx;
     this.palette = palette;
-    this.gridLayer = document.createElement("canvas");
   }
 
   get cellWidth() {
@@ -187,15 +156,12 @@ export class AsciiRenderer {
 
   setPalette(palette: Palette) {
     this.palette = palette;
-    this.paintGrid();
   }
 
   resize(width: number, height: number, dpr: number) {
     const prevCols = this.cols;
     const prevRows = this.rows;
 
-    this.width = width;
-    this.height = height;
     this.dpr = dpr;
     this.cw = clamp(Math.round(width / 80), 8, 12);
     this.ch = Math.round(this.cw * 1.45);
@@ -204,14 +170,10 @@ export class AsciiRenderer {
 
     this.canvas.width = Math.round(width * dpr);
     this.canvas.height = Math.round(height * dpr);
-    this.gridLayer.width = this.canvas.width;
-    this.gridLayer.height = this.canvas.height;
 
     if (this.cols !== prevCols || this.rows !== prevRows) {
       const n = this.cols * this.rows;
 
-      this.energy = new Float32Array(n);
-      this.energyTmp = new Float32Array(n);
       this.heat = new Float32Array(n);
       this.sharkFlag = new Uint8Array(n);
       this.sharkShade = new Float32Array(n);
@@ -220,12 +182,10 @@ export class AsciiRenderer {
       this.sharkKind = new Uint8Array(n);
       this.fishStamp = new Uint32Array(n);
     }
-
-    this.paintGrid();
   }
 
   render(world: World, dt: number) {
-    const { ctx, dpr, cols, ch } = this;
+    const { ctx, dpr, cols } = this;
 
     if (cols === 0) {
       return;
@@ -235,57 +195,21 @@ export class AsciiRenderer {
 
     this.consumeEvents(world);
     this.rasterizeSharks(world.sharks, t);
-    this.depositWake(world);
-    this.diffuse(dt);
+    this.decayHeat(dt);
 
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-    ctx.drawImage(this.gridLayer, 0, 0);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     this.markFish(world);
-    this.drawWake();
 
-    ctx.font = `600 ${Math.round(ch * 0.74)}px ${this.fontFamily}`;
+    ctx.font = `600 ${Math.round(this.ch * 0.74)}px ${this.fontFamily}`;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
 
     this.drawHeat();
     this.drawFish();
     this.drawSharks(t);
-  }
-
-  /** A faint cell grid, snapped to device pixels. */
-  private paintGrid() {
-    const g = this.gridLayer.getContext("2d");
-
-    if (g === null) {
-      return;
-    }
-
-    const { width: W, height: H, dpr, cw, ch } = this;
-
-    g.setTransform(1, 0, 0, 1, 0, 0);
-    g.clearRect(0, 0, this.gridLayer.width, this.gridLayer.height);
-    g.strokeStyle = this.palette.grid;
-    g.lineWidth = 1;
-    g.beginPath();
-
-    for (let c = 1; c < Math.ceil(W / cw); c += 1) {
-      const x = Math.round(c * cw * dpr) + 0.5;
-
-      g.moveTo(x, 0);
-      g.lineTo(x, H * dpr);
-    }
-
-    for (let r = 1; r < Math.ceil(H / ch); r += 1) {
-      const y = Math.round(r * ch * dpr) + 0.5;
-
-      g.moveTo(0, y);
-      g.lineTo(W * dpr, y);
-    }
-
-    g.stroke();
   }
 
   // ── sim → fields ────────────────────────────────────────────────────
@@ -322,66 +246,18 @@ export class AsciiRenderer {
     for (const event of world.events) {
       if (event.kind === "eat") {
         this.stamp(this.heat, event.x, event.y, 2, 1);
-        this.stamp(this.energy, event.x, event.y, 3, 0.9);
-      } else {
-        this.stamp(this.energy, event.x, event.y, 6, 1.4);
       }
     }
 
     world.events.length = 0;
   }
 
-  private bump(i: number, amount: number) {
-    if (i >= 0) {
-      this.energy[i] = Math.min(1.6, (this.energy[i] ?? 0) + amount);
-    }
-  }
-
-  private depositWake(world: World) {
-    for (const fish of world.fish) {
-      if (fish.alive) {
-        this.bump(this.cellIndex(fish.x, fish.y), 0.012 + fish.alarm * 0.03);
-      }
-    }
-
-    for (const shark of world.sharks) {
-      // The tail sweeps the most water.
-      for (let k = SHARK_NODES - 6; k < SHARK_NODES; k += 1) {
-        const i = this.cellIndex(nodeX(shark.nodes, k), nodeY(shark.nodes, k));
-
-        this.bump(i, 0.05 + shark.speed * 0.0012);
-      }
-    }
-
-    if (world.pointer.active) {
-      this.stamp(this.energy, world.pointer.x, world.pointer.y, 1, 0.08);
-    }
-  }
-
-  /** Blur and decay, so wakes spread out like ripples and fade. */
-  private diffuse(dt: number) {
-    const { cols, rows, energy: e, energyTmp: next, heat } = this;
-    const decay = Math.exp(-dt * 1.5);
-
-    for (let r = 0; r < rows; r += 1) {
-      for (let c = 0; c < cols; c += 1) {
-        const i = r * cols + c;
-        const self = e[i] ?? 0;
-        const left = c > 0 ? (e[i - 1] ?? 0) : self;
-        const right = c < cols - 1 ? (e[i + 1] ?? 0) : self;
-        const up = r > 0 ? (e[i - cols] ?? 0) : self;
-        const down = r < rows - 1 ? (e[i + cols] ?? 0) : self;
-
-        next[i] = (self * 4 + left + right + up + down) * 0.125 * decay;
-      }
-    }
-
-    this.energy = next;
-    this.energyTmp = e;
-    const heatDecay = Math.exp(-dt * 2.2);
+  private decayHeat(dt: number) {
+    const { heat } = this;
+    const decay = Math.exp(-dt * 2.2);
 
     for (let i = 0; i < heat.length; i += 1) {
-      heat[i] = (heat[i] ?? 0) * heatDecay;
+      heat[i] = (heat[i] ?? 0) * decay;
     }
   }
 
@@ -668,7 +544,7 @@ export class AsciiRenderer {
           const coverage = hits / 5;
           const i = r * cols + c;
 
-          // Key anchored to the body, so each glyph rides along with the skin.
+          // Key anchored to the body, so each accent rides along with the skin.
           sharkKey[i] = Math.floor(
             hash3(Math.round(s * 52), Math.round(v / (cw * 0.9)), shark.id) * 4_294_967_295,
           );
@@ -727,28 +603,26 @@ export class AsciiRenderer {
         continue;
       }
 
-      const glyph = cellGlyph(flag, shade, key);
-
-      ctx.fillStyle = this.skin(kind, cellLevel(flag, shade) * dim);
-      ctx.fillRect(x + 1, y + 1, cw - 1, ch - 1);
-
       if (flag === FLAG_EYE) {
         ctx.fillStyle = palette.eye;
       } else if (flag === FLAG_MARK) {
         ctx.fillStyle = palette.marks[kind] ?? palette.eye;
-      } else if (roll < 0.09) {
+      } else if (roll < 0.06) {
         ctx.fillStyle = accent;
-      } else if (roll < 0.13) {
-        ctx.fillStyle = palette.glint;
       } else {
-        ctx.fillStyle = shade > 0.55 ? palette.glyphOnLight : palette.glyphOnDark;
+        ctx.fillStyle = this.skin(kind, cellLevel(flag, shade) * dim);
       }
 
-      ctx.fillText(glyph, x + cw / 2, y + ch / 2 + 1);
+      ctx.fillRect(x, y, cw, ch);
+
+      if ((flag === FLAG_BODY || flag === FLAG_FIN) && shade < SHADOW_SHADE) {
+        ctx.fillStyle = palette.glyph;
+        ctx.fillText(shadowGlyph(flag, shade, key), x + cw / 2, y + ch / 2 + 1);
+      }
     }
   }
 
-  // ── fish, wake, heat ────────────────────────────────────────────────
+  // ── fish and heat ────────────────────────────────────────────────
 
   /**
    * Snaps each fish to a cell and buckets it by brightness: far fish are dim, near fish are
@@ -809,44 +683,7 @@ export class AsciiRenderer {
       const level = clamp(Math.floor(Math.min(1, h) * HEAT_LEVELS), 0, HEAT_LEVELS - 1);
 
       ctx.fillStyle = (h > 0.5 ? palette.heatHot[level] : palette.heatCool[level]) ?? palette.glint;
-      ctx.fillText(
-        h > 0.6 ? "*" : "·",
-        (i % cols) * cw + cw / 2,
-        Math.floor(i / cols) * ch + ch / 2 + 1,
-      );
-    }
-  }
-
-  /** Lights a small square in each cell where the wake is strong. One fill style per level. */
-  private drawWake() {
-    const { ctx, cols, cw, ch, energy, sharkFlag, fishStamp, frameId, wakeBuckets, palette } = this;
-
-    for (const bucket of wakeBuckets) {
-      bucket.length = 0;
-    }
-
-    for (const [i, e] of energy.entries()) {
-      if (e > WAKE_FLOOR && sharkFlag[i] === 0 && fishStamp[i] !== frameId) {
-        const level = clamp(Math.floor((e - WAKE_FLOOR) * 5), 0, WAKE_LEVELS - 1);
-
-        wakeBuckets[level]?.push(i);
-      }
-    }
-
-    const size = Math.max(2, Math.round(cw * 0.19)) + 1;
-
-    for (const [level, bucket] of wakeBuckets.entries()) {
-      ctx.fillStyle = palette.wake[level] ?? palette.glint;
-
-      for (const i of bucket) {
-        // The dot sits low right in its cell.
-        ctx.fillRect(
-          Math.round((i % cols) * cw + cw * 0.66 - size / 2),
-          Math.round(Math.floor(i / cols) * ch + ch * 0.64 - size / 2),
-          size,
-          size,
-        );
-      }
+      ctx.fillRect((i % cols) * cw, Math.floor(i / cols) * ch, cw, ch);
     }
   }
 }
