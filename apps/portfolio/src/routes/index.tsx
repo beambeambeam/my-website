@@ -1,3 +1,4 @@
+import { AsciiOcean } from "@my-website/ui/ascii-ocean";
 import { createFileRoute } from "@tanstack/react-router";
 import { AnimatePresence } from "motion/react";
 import { useRef } from "react";
@@ -86,7 +87,10 @@ const HomeComponent = () => {
                   <Twist />
                 </PixelatedBlockReveal>
               </Block>
-              <Block cols={4} rows={3} className="max-md:hidden" />
+              {/* An ASCII ocean fills the space beside the content. Hidden below md. */}
+              <Block cols={4} rows={3} className="relative max-md:hidden">
+                <AsciiOcean className="absolute inset-0" />
+              </Block>
               <Block cols={4}>
                 <PixelatedBlockReveal>
                   <ExperienceCard />
