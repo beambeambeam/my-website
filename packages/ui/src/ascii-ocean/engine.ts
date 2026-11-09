@@ -1,7 +1,6 @@
 import { readPalette } from "./palette";
 import { AsciiRenderer } from "./renderer";
 import { World } from "./world";
-import type { SharkSpec } from "./world";
 
 const STEP = 1 / 60;
 const MAX_STEPS = 4;
@@ -28,9 +27,9 @@ export class OceanEngine {
   private onScreen = false;
   private disposed = false;
 
-  constructor(canvas: HTMLCanvasElement, sharks: readonly SharkSpec[]) {
+  constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
-    this.world = new World(sharks);
+    this.world = new World();
     this.renderer = new AsciiRenderer(canvas, readPalette(canvas));
     this.renderer.setFontFamily(getComputedStyle(canvas).fontFamily);
     this.reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");
@@ -137,12 +136,12 @@ export class OceanEngine {
       this.acc = 0;
     }
 
-    this.draw(dt);
+    this.draw();
     this.raf = requestAnimationFrame(this.frame);
   };
 
-  private draw(dt: number) {
-    this.renderer.render(this.world, dt);
+  private draw() {
+    this.renderer.render(this.world);
     this.canvas.dataset.ready = "";
   }
 
@@ -159,7 +158,7 @@ export class OceanEngine {
       this.world.step(STEP);
     }
 
-    this.draw(STEP);
+    this.draw();
   }
 
   private toLocal(event: PointerEvent) {

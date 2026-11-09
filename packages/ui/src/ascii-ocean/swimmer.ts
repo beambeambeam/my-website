@@ -1,12 +1,10 @@
 /**
- * Swimmers: Siren and her mermaids. Like the sharks, they are seen from below with the belly to the
- * viewer. The head leads the way they swim, the tail sweeps from side to side and bends into
- * turns.
+ * Swimmers: Siren and her mermaids. They are seen from below with the belly to the viewer. The head
+ * leads the way they swim, the tail sweeps from side to side and bends into turns.
  *
  * A body is a shape in body units: `s` runs from the nose (0) to the tail tip (1), and `u` runs
  * across the body. Both are in units of the length. `swimmerCells` samples one point per grid cell,
- * so a swimmer can face any way, and the renderer draws the cells like the sharks: a block per
- * cell.
+ * so a swimmer can face any way, and the renderer draws a block per cell.
  */
 import { angleDiff, clamp, smoothstep, TAU } from "./math";
 
@@ -26,7 +24,7 @@ const INK = "#141416";
 
 /** Inks by body part. `D` is the outline of a tail. */
 export const SWIMMER_INKS: ReadonlyMap<string, SwimmerInk> = new Map([
-  // A dense texture, like the shadow side of a shark, keeps black hair visible on a dark page.
+  // A dense texture keeps black hair visible on a dark page.
   ["K", { fill: HAIR, glyph: "%#@8", ink: "#6a6a72" }],
   ["W", { fill: SKIN }],
   ["F", { fill: SKIN, glyph: "'", ink: "#8d887f" }],
@@ -227,7 +225,7 @@ export const swimToward = (
 
 /**
  * The way from the spine (a line from the head to the tail fin) to the point (x, y): a unit vector
- * and the distance in units of the length. Fish and sharks use it to give a swimmer room.
+ * and the distance in units of the length. Fish use it to give a swimmer room.
  */
 export const awayFrom = (swimmer: Swimmer, x: number, y: number) => {
   const fx = Math.cos(swimmer.heading);

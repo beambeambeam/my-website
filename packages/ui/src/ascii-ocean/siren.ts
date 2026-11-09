@@ -121,7 +121,6 @@ export const fitSiren = (
   const { width, height, time } = box;
   const minSide = Math.min(width, height);
 
-  // As long as the biggest shark.
   setLength(siren, Math.min(clamp(minSide * 0.46, 120, 430), minSide * 0.95));
 
   if (place) {

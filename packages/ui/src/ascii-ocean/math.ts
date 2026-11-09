@@ -28,20 +28,6 @@ export const angleDiff = (a: number, b: number) => {
   return d;
 };
 
-/** Cheap integer hash to [0, 1). It is deterministic, so textures stay stable from frame to frame. */
-// An integer hash needs xor and unsigned shifts.
-/* oxlint-disable no-bitwise */
-export const hash3 = (x: number, y: number, z: number) => {
-  let h = Math.imul(x, 374_761_393) ^ Math.imul(y, 668_265_263);
-
-  h ^= Math.imul(z, 1_442_695_041);
-  h = Math.imul(h ^ (h >>> 13), 1_274_126_177);
-  h ^= h >>> 16;
-
-  return (h >>> 0) / 4_294_967_296;
-};
-/* oxlint-enable no-bitwise */
-
 const K1 = 1 / 260;
 const K2 = 1 / 310;
 const K3 = 1 / 190;
