@@ -1,7 +1,7 @@
 /**
  * Mermaids: Siren's two small companions, a third of her length. Each has a round white head with a
- * red cap, two black antennae with red tips, dot eyes, an open mouth, and a red scaled tail. They
- * swim at her sides, a little behind her.
+ * red patch on the crown, two short black antennae, dot eyes, an open mouth, and a red scaled tail.
+ * They swim at her sides, a little behind her.
  */
 import { clamp, rand } from "./math";
 import {
@@ -16,48 +16,32 @@ import {
 import type { Swimmer } from "./swimmer";
 
 // Body layout, in units of the length. The head is most of the body. Seen head first from below,
-// the top of the head leads: the red cap and the antennae are at the front, the mouth is toward the
-// body.
-const HEAD_S = 0.3;
+// the top of the head leads: the red patch and the antennae are at the front, the mouth is toward
+// the body.
+const HEAD_S = 0.32;
 const HEAD_R = 0.28;
-const BODY_S = 0.6;
+const BODY_S = 0.62;
 const BODY_HALF_S = 0.2;
 const BODY_HALF_U = 0.24;
-const ANTENNA = { rootS: 0.1, rootU: 0.1, tipS: 0.01, tipU: 0.24, width: 0.04, tipR: 0.06 };
-const FLIPPER = { rootS: 0.5, rootU: 0.2, length: 0.1, width: 0.05 };
-const TAIL = { start: 0.7, fin: 0.86, width: 0.14, finWidth: 0.17, scaleRows: 14 };
+const FLIPPER = { rootS: 0.52, rootU: 0.2, length: 0.1, width: 0.05 };
+const TAIL = { start: 0.72, fin: 0.87, width: 0.14, finWidth: 0.17, scaleRows: 14 };
 
 /** The head, with `hs` from its center toward the tail and `au` the distance from the middle. */
 const headPart = (hs: number, au: number) => {
-  if (inEllipse(hs - 0.02, au - 0.13, 0.065, 0.065)) {
-    return "E";
-  }
-
-  if (inEllipse(hs - 0.16, au, 0.07, 0.07)) {
-    return "O";
-  }
-
-  // The cap dips a little at the sides, like a fringe.
-  return hs < -0.08 + au * 0.3 ? "C" : "W";
-};
-
-/**
- * An antenna: a black stalk from the front of the head, with a red tip. It draws like hair, so it
- * shows on a dark page.
- */
-const antennaPart = (s: number, au: number) => {
-  const { rootS, rootU, tipS, tipU, width, tipR } = ANTENNA;
-
-  if (Math.hypot(s - tipS, au - tipU) <= tipR) {
+  // A red patch on the crown.
+  if (inEllipse(hs + 0.13, au, 0.085, 0.13)) {
     return "C";
   }
 
-  const ls = tipS - rootS;
-  const lu = tipU - rootU;
-  const t = clamp(((s - rootS) * ls + (au - rootU) * lu) / (ls * ls + lu * lu), 0, 1);
+  if (inEllipse(hs - 0.03, au - 0.13, 0.06, 0.06)) {
+    return "E";
+  }
 
-  return t > 0 && Math.hypot(s - rootS - ls * t, au - rootU - lu * t) <= width ? "K" : ".";
+  return inEllipse(hs - 0.16, au, 0.07, 0.07) ? "O" : "W";
 };
+
+/** Two short black antennae on the crown. They draw like hair, so they show on a dark page. */
+const inAntenna = (s: number, au: number) => inEllipse(s - 0.03, au - 0.07, 0.065, 0.035);
 
 /** The body part at (s, u), or "." for open water. A mermaid is the same on both sides. */
 const mermaidBody = (s: number, u: number, phase: number) => {
@@ -67,10 +51,8 @@ const mermaidBody = (s: number, u: number, phase: number) => {
     return ".";
   }
 
-  const antenna = antennaPart(s, au);
-
-  if (antenna !== ".") {
-    return antenna;
+  if (inAntenna(s, au)) {
+    return "K";
   }
 
   if (Math.hypot(s - HEAD_S, au) <= HEAD_R) {
