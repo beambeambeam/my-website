@@ -37,7 +37,7 @@ const HomeComponent = () => {
         <div className="@container grid lg:grid-cols-[max-content_minmax(0,1fr)]">
           <header
             ref={headerRef}
-            className="mt-8 flex min-w-0 self-start border-t max-lg:items-end lg:sticky lg:top-0 lg:w-(--avatar) lg:flex-col"
+            className="mt-8 flex min-w-0 self-start border-t max-lg:items-center lg:sticky lg:top-0 lg:w-(--avatar) lg:flex-col"
           >
             <ProfileAvatar
               src={profile.avatarSrc}
@@ -53,7 +53,7 @@ const HomeComponent = () => {
                 {!greetingInView && (
                   <p
                     key="title"
-                    className="font-sans text-base whitespace-nowrap text-muted-foreground"
+                    className="font-sans text-base whitespace-nowrap text-muted-foreground max-lg:hidden"
                   >
                     <PixelatedTextReveal text={profile.title} startOnView={false} />
                   </p>
@@ -61,7 +61,7 @@ const HomeComponent = () => {
               </AnimatePresence>
             </div>
           </header>
-          <div className="mt-8 min-w-0 lg:mt-0 lg:border-l">
+          <div className="min-w-0 lg:border-l">
             <Grid className="lg:mt-8">
               {/* On lg, rows 1 and 2 end at the bottom line of the avatar. */}
               <Block cols={8} className="flex items-end p-4 sm:p-6 lg:min-h-(--greeting-h)">
