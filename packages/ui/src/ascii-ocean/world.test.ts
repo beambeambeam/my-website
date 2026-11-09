@@ -93,4 +93,24 @@ describe("World", () => {
       expect(nodeY(shark.nodes, 0)).toBeLessThanOrEqual(300);
     }
   });
+
+  test("keeps Siren inside the box, even when a click lures her to a corner", () => {
+    const world = new World(SHARKS);
+
+    world.resize(500, 700, 8, 12);
+
+    let worst = 0;
+
+    run(world, 60, () => {
+      if (world.time > world.lure.until && world.time % 10 < 5) {
+        world.splash(2, 2);
+      }
+
+      const { x, y, halfW, halfH } = world.siren;
+
+      worst = Math.max(worst, halfW - x, x + halfW - 500, halfH - y, y + halfH - 700);
+    });
+
+    expect(worst).toBeLessThanOrEqual(1e-6);
+  });
 });

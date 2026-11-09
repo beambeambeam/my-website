@@ -13,6 +13,8 @@ import type { SharkAnatomy } from "./anatomy";
 import { clamp, hash3 } from "./math";
 import { FISH_ALPHAS, HEAT_LEVELS, SKIN_LEVELS } from "./palette";
 import type { Palette } from "./palette";
+import { SIREN_BLINK_INKS, SIREN_INKS, sirenCells } from "./siren";
+import type { Siren } from "./siren";
 import { nodeX, nodeY, SHARK_NODES } from "./world";
 import type { Shark, World } from "./world";
 
@@ -210,6 +212,7 @@ export class AsciiRenderer {
     this.drawHeat();
     this.drawFish();
     this.drawSharks(t);
+    this.drawSiren(world.siren, t);
   }
 
   // ── sim → fields ────────────────────────────────────────────────────
@@ -618,6 +621,40 @@ export class AsciiRenderer {
       if ((flag === FLAG_BODY || flag === FLAG_FIN) && shade < SHADOW_SHADE) {
         ctx.fillStyle = palette.glyph;
         ctx.fillText(shadowGlyph(flag, shade, key), x + cw / 2, y + ch / 2 + 1);
+      }
+    }
+  }
+
+  // ── siren ───────────────────────────────────────────────────────────
+
+  /** Draws her body one block per cell, on top of everything, with a blink now and then. */
+  private drawSiren(siren: Siren, t: number) {
+    const { ctx, cw, ch } = this;
+    const blinking = t % 4.6 < 0.16;
+    const { col0, row0, rows } = sirenCells(siren, cw, ch);
+
+    for (const [r, line] of rows.entries()) {
+      for (const [c, part] of line.split("").entries()) {
+        const ink = (blinking ? SIREN_BLINK_INKS.get(part) : undefined) ?? SIREN_INKS.get(part);
+
+        if (ink === undefined) {
+          continue;
+        }
+
+        const col = col0 + c;
+        const row = row0 + r;
+
+        ctx.fillStyle = ink.fill;
+        ctx.fillRect(col * cw, row * ch, cw, ch);
+
+        if (ink.glyph !== undefined) {
+          ctx.fillStyle = ink.ink ?? ink.fill;
+          ctx.fillText(
+            charAt(ink.glyph, Math.abs(col * 7 + row * 3)),
+            col * cw + cw / 2,
+            row * ch + ch / 2 + 1,
+          );
+        }
       }
     }
   }
