@@ -11,14 +11,16 @@ import type { SharkKind } from "./anatomy";
  * builds over time and drops when they eat. They prefer fish in sparse spots, because dense schools
  * confuse predators. Eaten fish come back later as new schools that swim in from the edges.
  *
- * Siren: she swims from spot to spot, head first. Fish part around her without panic, and sharks
- * give her room.
+ * Swimmers: Siren swims from spot to spot, head first, and her two mermaids swim at her sides. Fish
+ * part around them without panic, and sharks give them room.
  *
  * Adapted from ascii-sharks by drewdi (MIT, see LICENSE).
  */
 import { angleDiff, clamp, current, rand, randInt, TAU } from "./math";
-import { awayFromSiren, createSiren, fitSiren, stepSiren } from "./siren";
+import { createMermaid, fitMermaids, stepMermaid } from "./mermaid";
+import { createSiren, fitSiren, stepSiren } from "./siren";
 import { FISH_SPECIES, pickSpecies, speciesAt } from "./species";
+import { awayFrom } from "./swimmer";
 
 export const SHARK_NODES = 20;
 
@@ -86,8 +88,8 @@ const BLIND_COS = -0.6;
 /** The snout turns back before it gets this close to an edge, as a fraction of the length. */
 const EDGE_INSET = 0.16;
 
-/** Fish keep this far from Siren's spine, in units of her length. Sharks keep a little more. */
-const SIREN_ROOM = 0.34;
+/** Fish keep this far from a swimmer's spine, in units of its length. Sharks keep a little more. */
+const SWIMMER_ROOM = 0.34;
 
 /** How long sharks circle the spot of a click, in seconds. */
 const LURE_TIME = 3.5;
@@ -120,6 +122,9 @@ export class World {
   /** A spot that sharks circle for a while after a click. */
   lure = { x: 0, y: 0, until: 0 };
   readonly siren = createSiren();
+  readonly mermaids = [createMermaid(1), createMermaid(-1)] as const;
+  /** Siren and her mermaids, in draw order: the mermaids swim under her. */
+  readonly swimmers = [...this.mermaids, this.siren] as const;
 
   /** Fish neighborhood radius. The spatial hash bucket size matches it. */
   private perception = 60;
@@ -152,6 +157,7 @@ export class World {
     this.foreignSep = cellW * 3;
 
     fitSiren(this.siren, this, first);
+    fitMermaids(this.mermaids, this.siren, this, first);
 
     if (first || this.fish.length === 0) {
       this.seed();
@@ -202,6 +208,11 @@ export class World {
     this.stepFish(dt);
     this.stepSharks(dt);
     stepSiren(this.siren, dt, this);
+
+    for (const mermaid of this.mermaids) {
+      stepMermaid(mermaid, this.siren, dt, this);
+    }
+
     this.respawn();
   }
 
@@ -338,7 +349,7 @@ export class World {
 
   // oxlint-disable-next-line max-statements, complexity -- One pass over each fish keeps the hot loop free of calls.
   private stepFish(dt: number) {
-    const { fish: school, sharks, pointer, siren, width: W, height: H, time, flow } = this;
+    const { fish: school, sharks, pointer, swimmers, width: W, height: H, time, flow } = this;
     const R2 = this.perception * this.perception;
     const size = this.perception;
     const cols = this.bucketCols;
@@ -511,14 +522,16 @@ export class World {
         }
       }
 
-      // Part around Siren without panic.
-      const away = awayFromSiren(siren, f.x, f.y);
+      // Part around the swimmers without panic.
+      for (const swimmer of swimmers) {
+        const away = awayFrom(swimmer, f.x, f.y);
 
-      if (away.d < SIREN_ROOM) {
-        const w = 1 - away.d / SIREN_ROOM;
+        if (away.d < SWIMMER_ROOM) {
+          const w = 1 - away.d / SWIMMER_ROOM;
 
-        ax += away.x * FISH_FLEE_K * 0.7 * w;
-        ay += away.y * FISH_FLEE_K * 0.7 * w;
+          ax += away.x * FISH_FLEE_K * 0.7 * w;
+          ay += away.y * FISH_FLEE_K * 0.7 * w;
+        }
       }
 
       // Alarm: a direct threat sets it, neighbors pass it along (a little weaker each hop), and it
@@ -583,7 +596,7 @@ export class World {
 
   // oxlint-disable-next-line max-statements, complexity -- Each steering force reads the same locals.
   private stepSharks(dt: number) {
-    const { sharks, siren, width: W, height: H, time, lure } = this;
+    const { sharks, swimmers, width: W, height: H, time, lure } = this;
     const cxW = W / 2;
     const cyW = H / 2;
     const luring = time < lure.until;
@@ -670,14 +683,16 @@ export class World {
         }
       }
 
-      // Give Siren room: steer the snout away from her.
-      const from = awayFromSiren(siren, hx, hy);
+      // Give the swimmers room: steer the snout away from them.
+      for (const swimmer of swimmers) {
+        const from = awayFrom(swimmer, hx, hy);
 
-      if (from.d < SIREN_ROOM * 1.4) {
-        const push = (1 - from.d / (SIREN_ROOM * 1.4)) * 3;
+        if (from.d < SWIMMER_ROOM * 1.4) {
+          const push = (1 - from.d / (SWIMMER_ROOM * 1.4)) * 3;
 
-        dx += from.x * push;
-        dy += from.y * push;
+          dx += from.x * push;
+          dy += from.y * push;
+        }
       }
 
       // Stay in the box: look ahead along the heading, and when that point leaves the box, turn

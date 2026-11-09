@@ -94,7 +94,7 @@ describe("World", () => {
     }
   });
 
-  test("keeps Siren inside the box, even when a click lures her to a corner", () => {
+  test("keeps Siren and her mermaids inside the box, even when a click lures her to a corner", () => {
     const world = new World(SHARKS);
 
     world.resize(500, 700, 8, 12);
@@ -106,11 +106,34 @@ describe("World", () => {
         world.splash(2, 2);
       }
 
-      const { x, y, halfW, halfH } = world.siren;
-
-      worst = Math.max(worst, halfW - x, x + halfW - 500, halfH - y, y + halfH - 700);
+      for (const { x, y, halfW, halfH } of world.swimmers) {
+        worst = Math.max(worst, halfW - x, x + halfW - 500, halfH - y, y + halfH - 700);
+      }
     });
 
     expect(worst).toBeLessThanOrEqual(1e-6);
+  });
+
+  test("mermaids are a third of Siren and stay close to her", () => {
+    const world = new World(SHARKS);
+
+    world.resize(900, 700, 8, 12);
+    run(world, 10);
+
+    let total = 0;
+    let steps = 0;
+
+    run(world, 60, () => {
+      for (const mermaid of world.mermaids) {
+        total += Math.hypot(mermaid.x - world.siren.x, mermaid.y - world.siren.y);
+        steps += 1;
+      }
+    });
+
+    for (const mermaid of world.mermaids) {
+      expect(mermaid.length).toBeCloseTo(world.siren.length / 3);
+    }
+
+    expect(total / steps).toBeLessThan(world.siren.length * 0.9);
   });
 });
