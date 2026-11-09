@@ -87,7 +87,7 @@ const BLIND_COS = -0.6;
 const EDGE_INSET = 0.16;
 
 /** Fish keep this far from Siren's spine, in units of her length. Sharks keep a little more. */
-const SIREN_ROOM = 0.3;
+const SIREN_ROOM = 0.34;
 
 /** How long sharks circle the spot of a click, in seconds. */
 const LURE_TIME = 3.5;
