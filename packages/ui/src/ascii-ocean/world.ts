@@ -74,6 +74,14 @@ export class World {
   private bucketHead = new Int32Array(0);
   private bucketNext = new Int32Array(0);
   private readonly flow = { x: 0, y: 0 };
+
+  /** Size of Siren and her mermaids: 1 is full size, 0.5 is half. */
+  readonly swimmerScale: number;
+
+  constructor(swimmerScale = 1) {
+    this.swimmerScale = swimmerScale;
+  }
+
   resize(width: number, height: number, cellW: number, cellH: number) {
     const first = this.width === 0;
 

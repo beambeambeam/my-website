@@ -4,6 +4,11 @@ import { useCallback } from "react";
 import { OceanEngine } from "./engine";
 
 export interface AsciiOceanProps {
+  /**
+   * Size of Siren and her mermaids: 1 is full size, 0.5 is half, 2 is double. A change restarts the
+   * ocean.
+   */
+  swimmerScale?: number;
   className?: string;
 }
 
@@ -13,15 +18,18 @@ export interface AsciiOceanProps {
  * look. Draws in the text color over the `--background` color, and holds one frame with reduced
  * motion.
  */
-export const AsciiOcean = ({ className }: AsciiOceanProps) => {
+export const AsciiOcean = ({ swimmerScale = 1, className }: AsciiOceanProps) => {
   // A callback ref with cleanup runs once per mounted canvas.
-  const canvasRef = useCallback((canvas: HTMLCanvasElement) => {
-    const engine = new OceanEngine(canvas);
+  const canvasRef = useCallback(
+    (canvas: HTMLCanvasElement) => {
+      const engine = new OceanEngine(canvas, swimmerScale);
 
-    return () => {
-      engine.destroy();
-    };
-  }, []);
+      return () => {
+        engine.destroy();
+      };
+    },
+    [swimmerScale],
+  );
 
   return (
     <canvas

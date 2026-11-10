@@ -27,9 +27,9 @@ export class OceanEngine {
   private onScreen = false;
   private disposed = false;
 
-  constructor(canvas: HTMLCanvasElement) {
+  constructor(canvas: HTMLCanvasElement, swimmerScale: number) {
     this.canvas = canvas;
-    this.world = new World();
+    this.world = new World(swimmerScale);
     this.renderer = new AsciiRenderer(canvas, readPalette(canvas));
     this.renderer.setFontFamily(getComputedStyle(canvas).fontFamily);
     this.reducedMotion = matchMedia("(prefers-reduced-motion: reduce)");

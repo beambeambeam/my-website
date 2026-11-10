@@ -112,16 +112,19 @@ const pickTarget = (siren: Siren, width: number, height: number, time: number) =
   siren.retargetAt = time + rand(6, 11);
 };
 
-/** Sizes her to the box. On the first call she also gets a random spot. */
+/**
+ * Sizes her to the box, times `scale`: 1 is about half of the shorter side, up to 430 px. She never
+ * gets longer than the box. On the first call she also gets a random spot.
+ */
 export const fitSiren = (
   siren: Siren,
-  box: { width: number; height: number; time: number },
+  box: { width: number; height: number; time: number; swimmerScale: number },
   place: boolean,
 ) => {
-  const { width, height, time } = box;
+  const { width, height, time, swimmerScale } = box;
   const minSide = Math.min(width, height);
 
-  setLength(siren, Math.min(clamp(minSide * 0.46, 120, 430), minSide * 0.95));
+  setLength(siren, Math.min(clamp(minSide * 0.46, 120, 430) * swimmerScale, minSide * 0.95));
 
   if (place) {
     siren.x = rand(0, width);

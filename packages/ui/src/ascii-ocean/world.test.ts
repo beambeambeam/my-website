@@ -89,6 +89,17 @@ describe("World", () => {
     expect(total / steps).toBeLessThan(world.siren.length * 0.9);
   });
 
+  test("scales Siren and her mermaids by swimmerScale", () => {
+    const full = new World();
+    const half = new World(0.5);
+
+    full.resize(1400, 900, 8, 12);
+    half.resize(1400, 900, 8, 12);
+
+    expect(half.siren.length).toBeCloseTo(full.siren.length / 2);
+    expect(half.mermaids[0].length).toBeCloseTo(full.mermaids[0].length / 2);
+  });
+
   test("keeps the fish near the box", () => {
     const world = new World();
 
