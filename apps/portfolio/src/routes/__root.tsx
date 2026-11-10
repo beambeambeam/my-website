@@ -2,6 +2,7 @@ import { Toaster } from "@my-website/ui/components/sonner";
 import { Outlet, createRootRoute } from "@tanstack/react-router";
 import { lazy, Suspense } from "react";
 
+import { NotFound } from "@/components/not-found";
 import { ThemeProvider } from "@/components/theme-provider";
 
 import "@/index.css";
@@ -33,4 +34,5 @@ const RootComponent = () => (
 
 export const Route = createRootRoute({
   component: RootComponent,
+  notFoundComponent: NotFound,
 });
