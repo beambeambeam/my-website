@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vite-plus/test";
 
-import { World } from "./world";
+import { fishCountFor, World } from "./world";
 
 const STEP = 1 / 60;
 
@@ -111,5 +111,29 @@ describe("World", () => {
     );
 
     expect(outside).toHaveLength(0);
+  });
+
+  test("fits the fish count to the box after a big resize", () => {
+    const world = new World();
+
+    world.resize(400, 400, 8, 12);
+    world.resize(1400, 900, 8, 12);
+
+    expect(world.fish).toHaveLength(fishCountFor(1400, 900));
+
+    world.resize(400, 400, 8, 12);
+
+    expect(world.fish).toHaveLength(fishCountFor(400, 400));
+  });
+
+  test("keeps the fish count through a small resize", () => {
+    const world = new World();
+
+    world.resize(1400, 900, 8, 12);
+    const count = world.fish.length;
+
+    world.resize(1400, 840, 8, 12);
+
+    expect(world.fish).toHaveLength(count);
   });
 });

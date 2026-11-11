@@ -47,8 +47,14 @@ const SWIMMER_ROOM = 0.34;
 const LURE_TIME = 3.5;
 
 /** A fish has room for its own cell. More fish than cells make a gray carpet, so cap it. */
-const fishCountFor = (width: number, height: number) =>
+export const fishCountFor = (width: number, height: number) =>
   clamp(Math.round((width * height) / 4400), 60, 340);
+
+/**
+ * A resize changes the fish count only when it is off by more than this fraction, so small resizes
+ * (a mobile address bar that shows or hides) do not add or remove fish.
+ */
+const RECOUNT_SLACK = 0.15;
 
 export class World {
   width = 0;
@@ -96,16 +102,12 @@ export class World {
     fitSiren(this.siren, this, first);
     fitMermaids(this.mermaids, this.siren, this, first);
 
-    if (first || this.fish.length === 0) {
-      this.seed();
-
-      return;
-    }
-
     for (const fish of this.fish) {
       fish.x = clamp(fish.x, 0, width);
       fish.y = clamp(fish.y, 0, height);
     }
+
+    this.recount(first);
   }
 
   splash(x: number, y: number) {
@@ -141,40 +143,62 @@ export class World {
     }
   }
 
-  private seed() {
-    const { width: W, height: H } = this;
-    const total = fishCountFor(W, H);
+  /**
+   * Fits the fish count to the box. Extra fish are cut from the newest school. New schools start at
+   * random spots on the first call, and after that swim in from a side.
+   */
+  private recount(first: boolean) {
+    const total = fishCountFor(this.width, this.height);
 
-    this.fish = [];
-
-    while (this.fish.length < total) {
-      const species = pickSpecies();
-      const sp = speciesAt(species);
-      const size = Math.min(randInt(sp.schoolSize[0], sp.schoolSize[1]), total - this.fish.length);
-      const millDir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
-      const cx = rand(W * 0.08, W * 0.92);
-      const cy = rand(H * 0.08, H * 0.92);
-      // Mostly level headings: fish cruise sideways far more than up or down.
-      const dir = (Math.random() < 0.5 ? 0 : Math.PI) + rand(-0.5, 0.5);
-      const spreadX = (this.sepX[species] ?? 10) * Math.sqrt(size);
-      const spreadY = (this.sepY[species] ?? 10) * Math.sqrt(size) * 0.6;
-
-      for (let k = 0; k < size; k += 1) {
-        this.fish.push({
-          x: clamp(cx + rand(-1, 1) * spreadX, 0, W),
-          y: clamp(cy + rand(-1, 1) * spreadY, 0, H),
-          vx: Math.cos(dir) * sp.cruise,
-          vy: Math.sin(dir) * sp.cruise,
-          species,
-          alarm: 0,
-          turn: 0,
-          depth: rand(0.55, 1),
-          millDir,
-        });
-      }
+    if (!first && Math.abs(this.fish.length - total) <= total * RECOUNT_SLACK) {
+      return;
     }
 
-    this.bucketNext = new Int32Array(this.fish.length);
+    if (this.fish.length > total) {
+      this.fish.length = total;
+    }
+
+    while (this.fish.length < total) {
+      this.addSchool(total - this.fish.length, first);
+    }
+  }
+
+  private addSchool(room: number, first: boolean) {
+    const { width: W, height: H } = this;
+    const species = pickSpecies();
+    const sp = speciesAt(species);
+    const size = Math.min(randInt(sp.schoolSize[0], sp.schoolSize[1]), room);
+    const millDir: 1 | -1 = Math.random() < 0.5 ? 1 : -1;
+    const fromLeft = Math.random() < 0.5;
+    const spreadX = (this.sepX[species] ?? 10) * Math.sqrt(size);
+    const spreadY = (this.sepY[species] ?? 10) * Math.sqrt(size) * 0.6;
+    const cx = rand(W * 0.08, W * 0.92);
+    const cy = rand(H * 0.08, H * 0.92);
+    // Mostly level headings: fish cruise sideways far more than up or down.
+    const dir = (fromLeft ? 0 : Math.PI) + rand(-0.5, 0.5);
+
+    // A new school after a resize waits in a strip just off one side, and the soft walls pull it in.
+    const spawnX = () => {
+      if (first) {
+        return clamp(cx + rand(-1, 1) * spreadX, 0, W);
+      }
+
+      return fromLeft ? rand(-60, -10) : W + rand(10, 60);
+    };
+
+    for (let k = 0; k < size; k += 1) {
+      this.fish.push({
+        x: spawnX(),
+        y: clamp(cy + rand(-1, 1) * spreadY * (first ? 1 : 1.5), 0, H),
+        vx: Math.cos(dir) * sp.cruise,
+        vy: Math.sin(dir) * sp.cruise,
+        species,
+        alarm: 0,
+        turn: 0,
+        depth: rand(0.55, 1),
+        millDir,
+      });
+    }
   }
 
   private rebuildHash() {
