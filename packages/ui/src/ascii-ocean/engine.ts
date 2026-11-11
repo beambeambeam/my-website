@@ -57,6 +57,7 @@ export class OceanEngine {
     document.addEventListener("visibilitychange", this.schedule);
     canvas.addEventListener("pointermove", this.onPointerMove, { passive: true });
     canvas.addEventListener("pointerdown", this.onPointerDown, { passive: true });
+    canvas.addEventListener("pointerup", this.onPointerUp);
     canvas.addEventListener("pointerleave", this.onPointerLeave);
     canvas.addEventListener("pointercancel", this.onPointerLeave);
 
@@ -85,6 +86,7 @@ export class OceanEngine {
     document.removeEventListener("visibilitychange", this.schedule);
     this.canvas.removeEventListener("pointermove", this.onPointerMove);
     this.canvas.removeEventListener("pointerdown", this.onPointerDown);
+    this.canvas.removeEventListener("pointerup", this.onPointerUp);
     this.canvas.removeEventListener("pointerleave", this.onPointerLeave);
     this.canvas.removeEventListener("pointercancel", this.onPointerLeave);
   }
@@ -171,16 +173,24 @@ export class OceanEngine {
     const { x, y } = this.toLocal(event);
     const { pointer } = this.world;
 
+    // A touch only moves while the finger is down, so fish flee a dragging finger too.
     pointer.x = x;
     pointer.y = y;
-    pointer.active = event.pointerType !== "touch";
+    pointer.active = true;
   };
 
   private readonly onPointerDown = (event: PointerEvent) => {
-    if (this.animating) {
-      const { x, y } = this.toLocal(event);
+    this.onPointerMove(event);
 
-      this.world.splash(x, y);
+    if (this.animating) {
+      this.world.splash(this.world.pointer.x, this.world.pointer.y);
+    }
+  };
+
+  /** A lifted finger leaves no pointer behind. A mouse stays until it leaves the canvas. */
+  private readonly onPointerUp = (event: PointerEvent) => {
+    if (event.pointerType === "touch") {
+      this.onPointerLeave();
     }
   };
 
