@@ -8,6 +8,7 @@
     "./lib/*": "./src/lib/*.ts",
     "./components/*": "./src/components/*.tsx",
     "./hooks/*": "./src/hooks/*.ts",
+    "./ascii-ocean": "./src/ascii-ocean/index.ts",
     "./postcss.config": "./postcss.config.mjs"
   },
   "scripts": {
