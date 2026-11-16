@@ -24,7 +24,7 @@ export const LibsToolsCard = () => {
     <div>
       <h2 className="sr-only">Libs &amp; Tools</h2>
       <div className="grid md:grid-cols-[max-content_minmax(0,1fr)]">
-        <div className="flex w-fit flex-col p-4">
+        <div className="flex w-fit flex-col gap-1 px-4 py-3 sm:px-6">
           <p className="text-xs text-muted-foreground uppercase">I work a lot with</p>
           <div
             aria-hidden="true"
@@ -50,7 +50,7 @@ export const LibsToolsCard = () => {
           {toolCategories.map((category) => (
             <div
               key={category.label}
-              className="flex flex-col gap-1.5 border-b p-4 last:border-b-0"
+              className="flex flex-col gap-1.5 border-b px-4 py-3 last:border-b-0 sm:px-6"
             >
               <h3
                 className={cn(
