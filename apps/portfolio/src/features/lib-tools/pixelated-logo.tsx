@@ -67,6 +67,11 @@ interface PixelatedLogoProps {
   duration?: number;
 }
 
+interface LogoBuildState {
+  ignore: boolean;
+  pixelSweep: PixelSweep | null;
+}
+
 /**
  * Shows the mono logo in the foreground color. When active, colored pixel blocks sweep up the logo
  * and sharpen into the full-color logo, or into the brand color when the tool has none. When
@@ -80,8 +85,10 @@ export const PixelatedLogo = ({ tool, active, duration = 0.35 }: PixelatedLogoPr
   const reduceMotion = useReducedMotion() === true;
 
   useEffect(() => {
-    let ignore = false;
-    let pixelSweep: PixelSweep | null = null;
+    const state: LogoBuildState = {
+      ignore: false,
+      pixelSweep: null,
+    };
 
     const build = async () => {
       const source = await getImageSource(getLogoSrc(tool));
@@ -89,28 +96,28 @@ export const PixelatedLogo = ({ tool, active, duration = 0.35 }: PixelatedLogoPr
       const colorElement = colorRef.current;
       const canvas = canvasRef.current;
 
-      if (ignore || monoElement === null || colorElement === null || canvas === null) {
+      if (state.ignore || monoElement === null || colorElement === null || canvas === null) {
         return;
       }
 
-      pixelSweep = createPixelSweep(colorElement, canvas, source, {
+      state.pixelSweep = createPixelSweep(colorElement, canvas, source, {
         direction: "up",
         stepSize: STEP_SIZE,
         replaced: monoElement,
       });
-      pixelSweep?.render(progress.get());
+      state.pixelSweep?.render(progress.get());
     };
 
     void build();
 
     const unsubscribe = progress.on("change", (value) => {
-      pixelSweep?.render(value);
+      state.pixelSweep?.render(value);
     });
 
     return () => {
-      ignore = true;
+      state.ignore = true;
       unsubscribe();
-      pixelSweep?.clear();
+      state.pixelSweep?.clear();
     };
   }, [tool, progress]);
 

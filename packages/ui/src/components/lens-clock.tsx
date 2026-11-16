@@ -88,12 +88,16 @@ function useAngle(target: number | null, reduceMotion: boolean, options: SpringO
   return angle;
 }
 
+interface ClockTimers {
+  timeout?: ReturnType<typeof setTimeout>;
+  interval?: ReturnType<typeof setInterval>;
+}
+
 function useNow(fixed?: Date) {
   const [now, setNow] = React.useState<Date | null>(null);
 
   React.useEffect(() => {
-    let timeout: ReturnType<typeof setTimeout> | undefined;
-    let interval: ReturnType<typeof setInterval> | undefined;
+    const timers: ClockTimers = {};
 
     if (fixed === undefined) {
       const tick = () => {
@@ -103,18 +107,18 @@ function useNow(fixed?: Date) {
       tick();
 
       // Align updates with the wall-clock second.
-      timeout = setTimeout(
+      timers.timeout = setTimeout(
         () => {
           tick();
-          interval = setInterval(tick, 1000);
+          timers.interval = setInterval(tick, 1000);
         },
         1000 - (Date.now() % 1000),
       );
     }
 
     return () => {
-      clearTimeout(timeout);
-      clearInterval(interval);
+      clearTimeout(timers.timeout);
+      clearInterval(timers.interval);
     };
   }, [fixed]);
 
