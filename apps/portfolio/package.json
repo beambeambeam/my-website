@@ -13,33 +13,33 @@
     "env:generate": "varlock codegen"
   },
   "dependencies": {
-    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/core-free-icons": "^4.4.0",
     "@hugeicons/react": "^1.1.10",
     "@my-website/ui": "workspace:*",
-    "@tailwindcss/vite": "^4.3.3",
-    "@tanstack/react-router": "^1.170.44",
-    "@varlock/vite-integration": "1.5.4",
-    "motion": "^14.5.0",
+    "@tailwindcss/vite": "^4.3.5",
+    "@tanstack/react-router": "^1.170.46",
+    "@varlock/vite-integration": "1.5.5",
+    "motion": "^14.10.1",
     "next-themes": "catalog:",
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
-    "simple-icons": "^16.35.0",
+    "simple-icons": "^16.37.0",
     "sonner": "catalog:",
     "varlock": "catalog:",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@my-website/config": "workspace:*",
-    "@tanstack/react-router-devtools": "^1.167.2",
-    "@tanstack/router-plugin": "^1.168.45",
-    "@types/node": "^26.6.5",
+    "@tanstack/react-router-devtools": "^1.167.3",
+    "@tanstack/router-plugin": "^1.169.0",
+    "@types/node": "^26.6.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@vitejs/plugin-react": "^6.1.2",
-    "postcss": "^8.5.30",
+    "@vitejs/plugin-react": "^6.2.1",
+    "postcss": "^8.5.32",
     "tailwindcss": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
-    "wrangler": "^4.151.3"
+    "wrangler": "^4.158.0"
   }
 }
