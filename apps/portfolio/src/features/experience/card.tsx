@@ -25,10 +25,10 @@ interface ExperienceListProps {
 
 const ExperienceList = ({ heading, items }: ExperienceListProps) => (
   <>
-    <h2 className="flex h-12 items-center border-b px-4 font-serif text-base">{heading}</h2>
+    <h2 className="flex h-12 items-center border-b px-4 font-serif text-base sm:px-6">{heading}</h2>
     <ul className="[&:last-child>li:last-child]:border-b-0">
       {items.map((item) => (
-        <li key={item.title} className="flex flex-col gap-1 border-b px-4 py-3 text-base">
+        <li key={item.title} className="flex flex-col gap-1 border-b px-8 py-3 text-sm sm:px-10">
           <div className="flex items-baseline justify-between gap-4">
             <h3 className="font-medium">{item.title}</h3>
             <p className="whitespace-nowrap text-muted-foreground">{item.period}</p>
