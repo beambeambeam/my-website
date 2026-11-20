@@ -10,6 +10,7 @@ import { PixelatedBlockReveal } from "@/components/pixelated/block-reveal";
 import { PixelatedTextReveal } from "@/components/pixelated/text-reveal";
 import { ProfileAvatar } from "@/components/profile/avatar";
 import { ProfileBar } from "@/components/profile/bar";
+import { ProfileLinks } from "@/components/profile/links";
 import { Twist } from "@/components/textures/twist";
 import { ExperienceCard } from "@/features/experience/card";
 import { LibsToolsCard } from "@/features/lib-tools/card";
@@ -59,6 +60,7 @@ const HomeComponent = () => {
                   </p>
                 )}
               </AnimatePresence>
+              <ProfileLinks className="mt-2" />
             </div>
           </header>
           <div className="min-w-0 lg:border-l">
